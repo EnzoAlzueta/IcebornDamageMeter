@@ -1,0 +1,28 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {"major": 3, "minor": 24, "patch": 0},
+  "configurePresets": [
+    {
+      "name": "windows-release",
+      "displayName": "Windows x64 / MSVC / Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/cmake-release",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "cacheVariables": {"CMAKE_BUILD_TYPE": "Release", "BUILD_TESTING": "ON", "IDM_GRAPHICS_TESTS": "ON"}
+    },
+    {
+      "name": "windows-ci",
+      "inherits": "windows-release",
+      "binaryDir": "${sourceDir}/build/cmake-ci",
+      "cacheVariables": {"IDM_GRAPHICS_TESTS": "OFF"}
+    }
+  ],
+  "buildPresets": [
+    {"name": "windows-release", "configurePreset": "windows-release"},
+    {"name": "windows-ci", "configurePreset": "windows-ci"}
+  ],
+  "testPresets": [
+    {"name": "windows-release", "configurePreset": "windows-release", "output": {"outputOnFailure": true}, "execution": {"noTestsAction": "error"}},
+    {"name": "windows-ci", "configurePreset": "windows-ci", "output": {"outputOnFailure": true}, "execution": {"noTestsAction": "error"}}
+  ]
+}

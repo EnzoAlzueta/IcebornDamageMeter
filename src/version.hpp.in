@@ -1,0 +1,3 @@
+#pragma once
+#define IDM_VERSION "@PROJECT_VERSION@"
+#define IDM_GAME_SHA256 "@IDM_SUPPORTED_GAME_SHA@"

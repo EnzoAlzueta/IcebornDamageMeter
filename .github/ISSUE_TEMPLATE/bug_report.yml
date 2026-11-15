@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible problem with Iceborn Damage Meter.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Mod version and package revision
+      placeholder: 0.6.11-r2
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Game and graphics setup
+      description: Include game build, Windows version, DX11/DX12, GPU, driver, resolution, and relevant loaders/mods.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include quest type, party size, host/guest, and ChatTransport when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs and screenshots
+      description: Attach relevant evidence with personal data removed. The meter log is nativePC/plugins/iceborne_damage_meter.log.

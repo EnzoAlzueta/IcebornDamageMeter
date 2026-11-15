@@ -1,0 +1,13 @@
+{
+  "name": "Iceborne Damage Meter",
+  "version": "@PROJECT_VERSION@",
+  "platform": "windows-x64",
+  "graphics": "DirectX 11 or DirectX 12 (automatic), SDR",
+  "gameBuild": "@IDM_SUPPORTED_GAME_BUILD@",
+  "supportedGameSha256": ["@IDM_SUPPORTED_GAME_SHA@"],
+  "loaders": ["Iceborne Damage Meter Bootstrap", "Stracker's Loader", "MHW mod loader via XInput chain"],
+  "bootstrap": "xinput9_1_0.dll",
+  "installation": "manual-copy",
+  "plugin": "nativePC/plugins/iceborne_damage_meter.dll",
+  "license": "MIT"
+}

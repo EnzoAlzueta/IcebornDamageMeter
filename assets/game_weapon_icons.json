@@ -1,0 +1,29 @@
+{
+  "source": "Installed Monster Hunter World/chunk/chunkG0.bin",
+  "texture": "ui/common/tex/cmn_item00_ID.tex",
+  "textureSha256": "7e8bd3081253a0b84f7e86553cba1e2e3159c74c4a0cb9ab51f72432ca35da3d",
+  "rect": [
+    0,
+    960,
+    896,
+    1024
+  ],
+  "cellSize": 64,
+  "nativeWeaponToAtlasColumn": [
+    1,
+    0,
+    3,
+    2,
+    6,
+    7,
+    4,
+    5,
+    8,
+    9,
+    10,
+    13,
+    12,
+    11
+  ],
+  "copyright": "CAPCOM; extracted game artwork, not original MIT artwork"
+}

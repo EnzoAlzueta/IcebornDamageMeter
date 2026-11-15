@@ -1,0 +1,6 @@
+The fourteen weapon icons are original Monster Hunter: World game artwork,
+copyright CAPCOM. Extracted from the user's installed game texture
+ui/common/tex/cmn_item00_ID.tex (chunkG0.bin), equipment row, for this UI mod.
+This game artwork is separate from the project's original MIT-licensed code.
+See game_weapon_icons.json for the texture digest, crop and native type mapping.
+No chunk extractor, decompressor, full atlas or third-party DLL is distributed.
