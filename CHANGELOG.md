@@ -8,6 +8,7 @@
   candidate instructions, plus the required licenses, credits and manifest.
 - Use an explicit runtime document list and fresh staging directories so removed
   files cannot leak back into later packages.
+- Create the output directory when building packages from a fresh source checkout.
 - Preserve the exact tested 0.6.11 plugin, bootstrap and default INI bytes.
   This is a packaging revision, not a gameplay or graphics change.
 

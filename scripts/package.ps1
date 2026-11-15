@@ -11,6 +11,7 @@ if ($PackageRevision -gt 0) {
     $manifest | Add-Member -NotePropertyName packagingRevision -NotePropertyValue $PackageRevision -Force
 }
 $dist = Join-Path $projectRoot 'dist'
+New-Item -ItemType Directory -Path $dist -Force | Out-Null
 $checksums = @()
 $variants = @(
     @{suffix='windows-x64';bootstrap='xinput9_1_0.dll';guide='README-IceborneDamageMeter.txt'},
