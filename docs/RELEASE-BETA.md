@@ -49,4 +49,5 @@ Logging is unchanged and currently has no size cap or rotation.
 Nexus: https://www.nexusmods.com/monsterhunterworld/mods/8969
 Source: https://github.com/EnzoAlzueta/IcebornDamageMeter
 
-Prepared locally; publication is a separate action.
+GitHub beta: https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.14
+The source-github ZIP matches the release tag, including these publication docs.

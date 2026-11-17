@@ -3,15 +3,14 @@
 A compact, in-process damage meter for **Monster Hunter World: Iceborne** on
 Windows x64. No separate overlay application or translation service is required.
 
-**Public beta: 0.6.11.** Download the installable mod from
-[Nexus Mods](https://www.nexusmods.com/monsterhunterworld/mods/8969).
-The `r2` package revision removes development documents from the runtime ZIP
-and provides current installation guides; the tested DLLs and default settings
-are unchanged. This repository contains the source code and developer tools.
+**GitHub beta: 0.6.14.** Download the full installation or the existing-users
+update from the [release page](https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.14).
+The mod is also available on [Nexus Mods](https://www.nexusmods.com/monsterhunterworld/mods/8969).
+This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Prepared beta update: 0.6.14.** Removes in-game chat sending; the manual
+**Changes since 0.6.11-r2:** removes in-game chat sending; the manual
 clipboard action remains available. Includes saved settings to hide the DM shortcut
 and use manual panel visibility. With the panel and shortcut hidden, GPU drawing
 is skipped; recording continues. It also includes an optional cumulative binary hunt archive
@@ -20,7 +19,8 @@ in the background with bounded memory and startup reads; no historical analysis
 runs in-game. See [archive format and operation](docs/HUNT-ARCHIVE.md). This
 update has fifty passing local tests and limited DX12 gameplay evidence: one
 four-player hunt and independently verified recent/cumulative files. See the
-validation record for the scope of testing. Publication preparation is local.
+validation record for the scope of testing. Existing users can use the
+update-plugin-only ZIP to preserve their loader, configuration and saved hunts.
 
 [Installation](packaging/INSTALL.md) · [Español](packaging/INSTALL.es.md) ·
 [Compatibility](docs/COMPATIBILITY.md) · [Validation](docs/VALIDATION.md) ·

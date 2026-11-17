@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.14 — prepared beta update
+## 0.6.14 — beta update
 
 This update also includes the unpublished 0.6.12/0.6.13 work:
 

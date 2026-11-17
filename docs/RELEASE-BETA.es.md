@@ -1,4 +1,4 @@
-# Iceborn Damage Meter 0.6.14 — actualización beta preparada
+# Iceborn Damage Meter 0.6.14 — actualización beta
 
 - Permite ocultar el botón DM y desactivar la apertura al iniciar misión.
 - Sigue registrando con el panel oculto; omite el dibujo cuando está oculto.
@@ -22,4 +22,6 @@ no certifica todos los controles visuales, reinicios, salida limpia, FPS ni toda
 las configuraciones. Siguen fuera de soporte expediciones/Tierras Destino, HDR y
 recuperación de pérdida del dispositivo. El log sigue sin límite ni rotación.
 
-Estos archivos están preparados localmente; todavía no se subieron online.
+Release beta en GitHub:
+https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.14
+La actualización de Nexus se gestiona por separado desde la cuenta del autor.
