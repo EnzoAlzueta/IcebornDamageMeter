@@ -11,14 +11,16 @@ are unchanged. This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Development candidate: 0.6.14.** Removes in-game chat sending; the manual
+**Prepared beta update: 0.6.14.** Removes in-game chat sending; the manual
 clipboard action remains available. Includes saved settings to hide the DM shortcut
 and use manual panel visibility. With the panel and shortcut hidden, GPU drawing
 is skipped; recording continues. It also includes an optional cumulative binary hunt archive
 for a future external analyzer. The UI still keeps ten hunts. Storage is handled
 in the background with bounded memory and startup reads; no historical analysis
 runs in-game. See [archive format and operation](docs/HUNT-ARCHIVE.md). This
-candidate still requires real-game validation before replacing the public beta.
+update has fifty passing local tests and limited DX12 gameplay evidence: one
+four-player hunt and independently verified recent/cumulative files. See the
+validation record for the scope of testing. Publication preparation is local.
 
 [Installation](packaging/INSTALL.md) · [Español](packaging/INSTALL.es.md) ·
 [Compatibility](docs/COMPATIBILITY.md) · [Validation](docs/VALIDATION.md) ·

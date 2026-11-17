@@ -42,8 +42,12 @@ instructions. The minimal friend ZIP is an update for an existing Seamless setup
 it contains no INI or saved history.
 
 Merge folders. When updating, keep your existing INI and history; replace only
-this mod's plugin and bootstrap with the matching package versions. There is no
+this mod's plugin and, only when required, its matching bootstrap. There is no
 installer or installation command. Do not copy the source ZIP into the game.
+
+For an existing working installation, use the **update-plugin-only ZIP** with
+the game closed. It preserves the loader, INI and both hunt files. The 0.6.14
+plugin works with the existing 0.6.11 meter bootstrap. New users need the full ZIP.
 
 ## Controls
 

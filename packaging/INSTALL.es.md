@@ -29,7 +29,8 @@ no es una aplicación adicional. El ZIP de fuentes es para desarrollar.
 ## Actualizar o quitar
 
 Cerrá el juego. Conservá `iceborne_damage_meter.ini` e
-`iceborne_damage_meter_history.dat` en `nativePC/plugins`; no los reemplaces con
+`iceborne_damage_meter_history.dat` e `iceborne_damage_meter_hunts.bin` en
+`nativePC/plugins`; no los reemplaces con
 los predeterminados del ZIP nuevo. Reemplazá solamente nuestro plugin y, cuando
 una versión lo requiera, nuestro cargador correspondiente. Conservá los de otros mods.
 
@@ -37,6 +38,11 @@ Para quitar el medidor, borrá solo `nativePC/plugins/iceborne_damage_meter.dll`
 Podés conservar ajustes e historial. Quitá nuestro cargador únicamente si
 confirmaste que pertenece al paquete y tu instalación no lo necesita.
 No borres toda la carpeta `nativePC`.
+
+Si el mod ya funciona, usá el ZIP **update-plugin-only** con el juego cerrado.
+Reemplaza solo nuestro plugin y no incluye INI ni cargador. La 0.6.14 no requiere
+reemplazar el bootstrap del medidor 0.6.11 que ya funciona. Para una instalación
+nueva, usá el paquete completo siguiendo las instrucciones de arriba.
 
 ## Controles y tamaño
 

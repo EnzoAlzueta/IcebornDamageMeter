@@ -1,6 +1,13 @@
 # Changelog
 
-## 0.6.14 — development candidate
+## 0.6.14 — prepared beta update
+
+This update also includes the unpublished 0.6.12/0.6.13 work:
+
+- Add saved options to hide the DM shortcut and disable automatic quest opening.
+  Recording continues while hidden; fully hidden panels skip GPU drawing.
+- Add an optional cumulative binary hunt archive on the storage worker, separate
+  from the ten-hunt UI. No archive analysis runs in-game.
 
 - Remove in-game damage chat sending, both keyboard and native transports,
   along with its menu action, chat-key setting and background send polling.
@@ -8,6 +15,8 @@
 - Ignore old ChatTransport/ChatOpenKey INI entries without rewriting user files.
 - Update all UI translations and current installation guides.
 - Local automated validation and real-game status are recorded in docs/VALIDATION.md.
+- Provide a plugin-only update package that preserves existing loaders and data.
+- Keep the same tested DLLs. Logging behavior remains unchanged, with no size cap.
 
 
 ## 0.6.13 (candidate)

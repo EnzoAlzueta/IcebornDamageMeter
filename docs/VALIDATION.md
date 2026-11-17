@@ -14,8 +14,17 @@ test accounts for the decrease from 51. The existing persistence fixture was
 adjusted to the 17 settings slots. Localization auditing passed for 100 English
 strings and twelve complete translation columns. Menu/settings diagnostic images
 were visually inspected. No game was launched or chat submitted during validation.
-Real-game validation of this candidate and the preceding archive/visibility
-changes remains pending; these checks do not measure game FPS.
+A subsequent user playtest was reviewed on 2026-11-17. The latest 0.6.14 session
+initialized in DX12 and logged one completed four-player hunt without recorded
+errors. The ten-record recent file decoded successfully. The cumulative archive
+contained eleven valid CRC-checked frames, no exact duplicate frames, and a tail
+matching the ten recent records. Settings included ShowBadge=0 and AutoShow=1.
+
+This does not establish visual hide/clipboard behavior, a restart cycle, game
+FPS, crash-free exit or DX11 gameplay. Anonymized review evidence is retained in
+build/validation-0614/playtest-review-20261117.json. The user then requested
+preparation of the update for sharing without further code/logging changes.
+Publication packages retain the tested DLLs; no game was launched by Codex.
 
 ## 0.6.13 visibility candidate — 2026-11-17
 

@@ -25,6 +25,14 @@ startup/render/exit checks covered both APIs. The latest 0.6.9 gameplay fixes we
 user-tested locally, including native sharing in town. These observations do not
 certify every GPU, loader combination, language or four-player session.
 
+The prepared 0.6.14 update has fifty passing local tests. A subsequent user
+DX12 session archived one completed four-player hunt without recorded errors;
+the ten-record history and eleven-frame cumulative archive were independently
+decoded and verified. This is limited field evidence, not an FPS measurement or
+proof of every visual control, restart/exit behavior or hardware combination.
+Chat sending is removed; the clipboard report remains. See the current
+[validation record](VALIDATION.md). The 0.6.9/0.6.10 notes here are historical.
+
 0.6.10 standardizes source/documentation language; its real-game smoke test is
 pending. Versions 0.6.0, 0.6.1 and 0.6.2 were withdrawn after startup/shutdown
 failures. Do not redistribute or restore those versions. See [validation](VALIDATION.md).

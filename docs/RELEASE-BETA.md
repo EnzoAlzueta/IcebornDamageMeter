@@ -1,52 +1,52 @@
-> Historical release draft. Development version 0.6.14 removes chat sending;
-> see the current installation guide for clipboard summaries.
+# Iceborn Damage Meter 0.6.14 — beta update
 
-# Iceborne Damage Meter 0.6.11 — prepared public beta
+Changes since 0.6.11-r2:
 
-[Español](RELEASE-BETA.es.md) · [Installation](../INSTALL.md)
+- Hide the small DM button with a saved setting.
+- Choose whether the panel opens at quest start. Manual controls remain available.
+- Continue recording while hidden; skip panel/badge drawing when fully hidden.
+- Optionally save cumulative hunt summaries for future external analysis.
+  The in-game history still shows the ten most recent hunts.
+- Remove in-game damage chat sending. Copy damage summary remains available.
 
-An integrated damage meter for Monster Hunter World: Iceborne on Windows x64.
-Displays party damage, team share, observed DPS and recent hunts, with adjustable
-size/position and automatic language selection from the game's Steam settings.
+## Update
 
-## Included
+If the meter already works, close the game and use the update-plugin-only ZIP.
+Copy nativePC into the game folder and replace iceborne_damage_meter.dll.
+The update contains no INI, loader, saved hunts or personal data. Your existing
+loader, settings and history stay in place. Old chat settings are ignored.
 
-- Compact panel, mission details and ten-hunt history.
-- Mission names/objectives where cataloged; generic investigation labels.
-- Full player names when each entry fits; bounded chat messages and Copy summary.
-- Optional experimental direct chat without simulated typing.
-- Corrected native weapon icons, including Bow and Light Bowgun.
-- English primary source/docs and interface translations in 13 languages total.
-- Automatic DX11/DX12 selection with persistent settings and history.
+New users need the full windows-x64 ZIP and its installation guide. A clean
+installation uses nativePC plus the included XInput bootstrap. Existing loaders
+must follow their compatible loading route; never overwrite another mod's loader.
+The source ZIP is for developers, not game installation.
 
-## Known limits
+## Archive and controls
 
-No expedition or Guiding Lands damage measurement. Supported executable/profile
-421810 only, Windows x64, SDR. Missing quest translations fall back to English;
-Simplified Chinese quest titles are not in the upstream catalog. DPS describes
-observed participation including pauses/travel, not normalized skill. Generic
-investigations are not compared as identical hunts. Not all languages, parties,
-GPUs and loader combinations have real-game evidence.
+ArchiveHunts=1 under [Overlay] is the default even if absent from an existing INI.
+It appends summaries to nativePC/plugins/iceborne_damage_meter_hunts.bin on a
+background worker. Set ArchiveHunts=0 and restart to stop future archiving.
+Keep that file and iceborne_damage_meter_history.dat when updating. The new file
+does not recover hunts already discarded before archiving was introduced.
+No archive analysis or weapon ranking runs in the game.
 
-46 local tests passed. On 2026-11-15, the user reported successful 0.6.11 testing
-with a friend and no further crashes. The original ERR12 cause is not confirmed.
-0.6.11 reduces repeated DX11 UI raster work, suspends drawing on focus loss or
-minimize and adds graphics diagnostics. Do not treat successful chat request
-processing as delivery confirmation.
+F6 offers Show DM button and Show on quest start; both default to enabled.
+F8 show/hide, Ctrl+F8 preview, Ctrl+F6 menu, F7 history and Ctrl+F9 dragging are
+the defaults. Existing customized key bindings are preserved. Copy damage summary
+is in the menu and writes only to the clipboard; nothing is sent to game chat.
 
-## Installation and reporting
+## Validation and limits
 
-Follow [INSTALL.md](../INSTALL.md) for the supported installation setups,
-updates, chat configuration and removal. Preserve existing loader DLLs, INI and
-history. Direct chat is opt-in; new package settings default to paced keyboard.
+Fifty local tests passed, including DX11/DX12 diagnostic rendering and storage.
+A subsequent user DX12 session archived one completed four-player hunt without
+recorded errors. Recent/cumulative files passed independent format/CRC checks.
+This is limited field coverage, not universal compatibility, proof of every
+visual control, a clean exit, DX11 gameplay or a measured game FPS improvement.
 
-Reports should include version, DX11/DX12, loader/version, host/guest, hunt type,
-reproduction steps and relevant log excerpts with personal data removed.
+Expedition/Guiding Lands damage, HDR and device-loss recovery remain unsupported.
+Logging is unchanged and currently has no size cap or rotation.
 
-## Publication checklist
+Nexus: https://www.nexusmods.com/monsterhunterworld/mods/8969
+Source: https://github.com/EnzoAlzueta/IcebornDamageMeter
 
-The tested archives are frozen; matching English texts, nine labeled images and
-checksums are in dist/publication-0.6.11. Real-game screenshots can supplement the
-diagnostic previews. No upload was performed. Review the page preview and publish
-from the chosen account when ready. If publishing a repository, run its hosted CI
-before claiming hosted verification. Expedition damage remains out of scope.
+Prepared locally; publication is a separate action.
