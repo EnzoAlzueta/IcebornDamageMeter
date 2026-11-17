@@ -1,5 +1,5 @@
 #include "../src/panel.hpp"
-#include "../src/share_chat.hpp"
+#include "../src/damage_summary.hpp"
 #include <cstdio>
 using namespace meter;
 static int failures=0;
@@ -33,8 +33,6 @@ int main() {
         CHECK(lines.size()==2);
         for(const auto& line:lines){CHECK(line.size()<=80);CHECK(line.rfind(tr(L"[Damage] "),0)==0);}
         CHECK(lines.size()>1&&lines[1].find(L"ActualPlayer")!=std::wstring::npos);
-        const auto compact=damageChatLines(captureHunt(model,1000,0));
-        CHECK(compact.size()==1&&compact[0].find(L"1000")!=std::wstring::npos);
         CHECK(weaponStyle(0).name==std::wstring(tr(L"Great Sword")));
     }
     setLanguage(Language::English);CHECK(std::wstring(tr(L"Settings"))==L"Settings");
@@ -42,6 +40,6 @@ int main() {
     setLanguage(Language::Spanish);CHECK(questName(103)==L"La cacería del Gran Jagras");
     setLanguage(Language::ChineseSimplified);CHECK(questName(103)==L"The Great Jagras Hunt");
     setLanguage(static_cast<Language>(99));CHECK(currentLanguage()==Language::English);
-    std::puts(failures?"Language tests FAILED":"13 locales: UI, weapon names, quests/fallbacks, chat, priority and cache revision passed");
+    std::puts(failures?"Language tests FAILED":"13 locales: UI, weapon names, quests/fallbacks, clipboard, priority and cache revision passed");
     return failures?1:0;
 }

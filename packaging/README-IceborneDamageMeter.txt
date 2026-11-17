@@ -12,7 +12,7 @@ Never delete nativePC or another mod's loader.
 
 English guide: IceborneDamageMeter/INSTALL.md
 Spanish guide: IceborneDamageMeter/INSTALL.es.md
-ChatTransport=native under [Overlay] enables experimental direct chat.
+The menu can copy a damage summary to the clipboard. In-game chat sending is removed.
 Language=auto follows the game's Steam language. Expeditions have no damage data.
 
 Logs: nativePC/plugins/iceborne_damage_meter.log and the bootstrap log beside EXE.

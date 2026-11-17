@@ -46,7 +46,7 @@ The panel appears automatically during a mission. Default controls:
 | F8 | Show/hide |
 | Ctrl+F8 | Preview with sample data |
 | F6 | Settings |
-| Ctrl+F6 | Menu and manual sharing |
+| Ctrl+F6 | Menu and clipboard |
 | F7 | Recent hunt history |
 | Ctrl+F9 | Unlock/lock dragging |
 
@@ -85,23 +85,15 @@ Restart the game after changing it. Optional overrides: `en`, `es`, `pt-BR`,
 `fr`, `de`, `it`, `ja`, `ko`, `zh-CN`, `zh-TW`, `ru`, `pl`, `ar`.
 Missing quest translations fall back to English. Player names are preserved.
 
-## Share damage
+## Copy damage summary
 
-Open the menu and choose the current-damage chat action. Recorded mission totals
-remain available after returning to town until a new mission resets the meter.
-Preview data and empty missions cannot be shared. Copy summary is the explicit
-clipboard alternative.
+Open the menu and choose **Copy damage summary** to copy the current mission's
+report to the clipboard. Recorded totals remain available after returning to
+town until a new mission resets the meter. Preview data and empty missions
+cannot be copied. Nothing is sent to the game chat.
 
-New settings use `ChatTransport=keyboard` under `[Overlay]`, with paced input.
-`ChatOpenKey=45` means Insert; `13` means Enter. Match the game's chat binding.
-For experimental direct submission without typing, close the game and set
-`ChatTransport=native` in that section. Preserve the rest of your INI. Direct
-mode protects other drafts and does not automatically retry or switch to keyboard.
-
-Use an online session and the intended chat channel. Wait at least 15 seconds
-between requests. Long groups may need several messages. Confirm reception with
-another player; local request completion does not confirm delivery. Sharing
-occurs only when you request it.
+Chat sending has been removed. Old `ChatTransport` and `ChatOpenKey` entries in
+an existing INI are ignored; no configuration changes are required.
 
 ## Limitations and troubleshooting
 

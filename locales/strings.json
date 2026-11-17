@@ -127,20 +127,6 @@
       " · Czas ",
       " · المدة "
     ],
-    "A send attempt is already in progress": [
-      "Ya hay un intento de envío en curso",
-      "Já há uma tentativa de envio em andamento",
-      "Un envoi est déjà en cours",
-      "Ein Sendeversuch läuft bereits",
-      "Un tentativo di invio è già in corso",
-      "送信処理はすでに実行中です",
-      "이미 전송 시도 중입니다",
-      "已有发送尝试正在进行",
-      "已有傳送嘗試正在進行",
-      "Попытка отправки уже выполняется",
-      "Próba wysyłania już trwa",
-      "توجد محاولة إرسال قيد التنفيذ"
-    ],
     "Bow": [
       "Arco",
       "Arco",
@@ -182,34 +168,6 @@
       "Силовой клинок",
       "Topór energetyczny",
       "النصل المشحون"
-    ],
-    "Chat busy or unavailable; you can copy the summary": [
-      "Chat ocupado o no disponible; podés copiar el resumen",
-      "Chat ocupado ou indisponível; copie o resumo",
-      "Chat occupé ou indisponible ; copiez le résumé",
-      "Chat belegt oder nicht verfügbar; Übersicht kopieren",
-      "Chat occupata o non disponibile; puoi copiare il riepilogo",
-      "チャット使用中または利用不可。概要をコピーできます",
-      "채팅이 사용 중이거나 불가합니다. 요약을 복사할 수 있습니다",
-      "聊天正忙或不可用；可以复制摘要",
-      "聊天忙碌或無法使用；可複製摘要",
-      "Чат занят или недоступен; можно скопировать сводку",
-      "Czat zajęty lub niedostępny; możesz skopiować podsumowanie",
-      "الدردشة مشغولة أو غير متاحة؛ يمكنك نسخ الملخص"
-    ],
-    "Check chat: delivery unconfirmed": [
-      "Revisá el chat: entrega sin confirmar",
-      "Confira o chat: entrega não confirmada",
-      "Vérifiez le chat : livraison non confirmée",
-      "Chat prüfen: Zustellung unbestätigt",
-      "Controlla la chat: consegna non confermata",
-      "チャットを確認：到達は未確認",
-      "채팅 확인: 전달 여부 미확인",
-      "请查看聊天：尚未确认送达",
-      "請查看聊天：尚未確認送達",
-      "Проверьте чат: доставка не подтверждена",
-      "Sprawdź czat: dostarczenie niepotwierdzone",
-      "تحقق من الدردشة: التسليم غير مؤكد"
     ],
     "Checking game version or unsupported version": [
       "Verificando versión o versión no compatible",
@@ -294,34 +252,6 @@
       "Скопировать сводку урона",
       "Kopiuj podsumowanie obrażeń",
       "نسخ ملخص الضرر"
-    ],
-    "Could not send; you can copy the summary": [
-      "No se pudo enviar; podés copiar el resumen",
-      "Não foi possível enviar; copie o resumo",
-      "Envoi impossible ; vous pouvez copier le résumé",
-      "Senden fehlgeschlagen; Übersicht kann kopiert werden",
-      "Invio non riuscito; puoi copiare il riepilogo",
-      "送信できませんでした。集計をコピーできます",
-      "전송 실패; 요약을 복사할 수 있습니다",
-      "无法发送，可复制摘要",
-      "無法傳送，可複製摘要",
-      "Не удалось отправить; можно скопировать сводку",
-      "Nie udało się wysłać; możesz skopiować podsumowanie",
-      "تعذر الإرسال؛ يمكنك نسخ الملخص"
-    ],
-    "Current channel": [
-      "Canal actual",
-      "Canal atual",
-      "Canal actuel",
-      "Aktueller Kanal",
-      "Canale attuale",
-      "現在のチャンネル",
-      "현재 채널",
-      "当前频道",
-      "目前頻道",
-      "Текущий канал",
-      "Bieżący kanał",
-      "القناة الحالية"
     ],
     "Current quest details": [
       "Detalle de la misión actual",
@@ -518,20 +448,6 @@
       "Провалено",
       "Nieudana",
       "فاشلة"
-    ],
-    "Game chat key": [
-      "Tecla de chat del juego",
-      "Tecla do chat do jogo",
-      "Touche de discussion",
-      "Chat-Taste im Spiel",
-      "Tasto chat del gioco",
-      "チャットキー",
-      "게임 채팅 키",
-      "游戏聊天按键",
-      "遊戲聊天按鍵",
-      "Клавиша чата",
-      "Klawisz czatu",
-      "مفتاح دردشة اللعبة"
     ],
     "Great Sword": [
       "Gran espada",
@@ -1121,20 +1037,6 @@
       "Porównanie osobiste",
       "المقارنة الشخصية"
     ],
-    "Preparing damage summary": [
-      "Preparando resumen de daño",
-      "Preparando resumo de dano",
-      "Préparation du résumé des dégâts",
-      "Schadensübersicht wird vorbereitet",
-      "Preparazione del riepilogo danni",
-      "ダメージ概要を準備中",
-      "피해량 요약 준비 중",
-      "正在准备伤害摘要",
-      "正在準備傷害摘要",
-      "Подготовка сводки урона",
-      "Przygotowywanie podsumowania obrażeń",
-      "جارٍ إعداد ملخص الضرر"
-    ],
     "Quest": [
       "Misión",
       "Missão",
@@ -1205,20 +1107,6 @@
       "Wybierz polowanie, aby zobaczyć szczegóły",
       "اختر رحلة صيد لعرض التفاصيل"
     ],
-    "Send cancelled; you can copy the summary": [
-      "Envío cancelado; podés copiar el resumen",
-      "Envio cancelado; você pode copiar o resumo",
-      "Envoi annulé ; vous pouvez copier le résumé",
-      "Senden abgebrochen; Übersicht kann kopiert werden",
-      "Invio annullato; puoi copiare il riepilogo",
-      "送信を中止しました。集計をコピーできます",
-      "전송 취소; 요약을 복사할 수 있습니다",
-      "发送已取消，可复制摘要",
-      "傳送已取消，可複製摘要",
-      "Отправка отменена; можно скопировать сводку",
-      "Wysyłanie anulowane; możesz skopiować podsumowanie",
-      "تم إلغاء الإرسال؛ يمكنك نسخ الملخص"
-    ],
     "Settings": [
       "Ajustes",
       "Ajustes",
@@ -1232,20 +1120,6 @@
       "Настройки",
       "Ustawienia",
       "الإعدادات"
-    ],
-    "Share current damage in chat": [
-      "Enviar daño actual al chat",
-      "Enviar dano atual ao chat",
-      "Partager les dégâts actuels",
-      "Aktuellen Schaden teilen",
-      "Invia danni attuali in chat",
-      "現在のダメージを送信",
-      "현재 피해량 채팅 공유",
-      "分享当前伤害到聊天",
-      "分享目前傷害至聊天",
-      "Отправить текущий урон",
-      "Wyślij bieżące obrażenia",
-      "إرسال الضرر الحالي للدردشة"
     ],
     "Show / hide": [
       "Mostrar / ocultar",
@@ -1358,20 +1232,6 @@
       "Всего: ",
       "Suma: ",
       "الإجمالي: "
-    ],
-    "Trying to open game chat": [
-      "Intentando abrir el chat del juego",
-      "Tentando abrir o chat do jogo",
-      "Tentative d'ouverture de la discussion",
-      "Spielchat wird zu öffnen versucht",
-      "Tentativo di apertura della chat",
-      "ゲームチャットを開いています",
-      "게임 채팅을 여는 중",
-      "正在尝试打开游戏聊天",
-      "正在嘗試開啟遊戲聊天",
-      "Попытка открыть игровой чат",
-      "Próba otwarcia czatu gry",
-      "جارٍ محاولة فتح دردشة اللعبة"
     ],
     "Unknown weapon": [
       "Arma desconocida",

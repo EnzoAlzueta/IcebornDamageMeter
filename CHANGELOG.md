@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.14 — development candidate
+
+- Remove in-game damage chat sending, both keyboard and native transports,
+  along with its menu action, chat-key setting and background send polling.
+- Keep manual Copy damage summary, recent history and cumulative hunt storage.
+- Ignore old ChatTransport/ChatOpenKey INI entries without rewriting user files.
+- Update all UI translations and current installation guides.
+- Local automated validation and real-game status are recorded in docs/VALIDATION.md.
+
+
 ## 0.6.13 (candidate)
 
 - Add saved settings to hide the small DM shortcut and disable automatic panel

@@ -24,9 +24,10 @@ in HunterPie (Apache-2.0). This does not include its bypass or patching routines
 
 ## Native chat field reference
 
-The bounded native chat implementation uses the 15.23 layout published in
+Historical versions 0.6.7–0.6.13 used the 15.23 native chat layout published in
 mhw-toolkit, Copyright 2024 Eigeen, Apache-2.0, as a technical reference. The
-toolkit library is not linked or bundled. Its license is retained in
+toolkit library is not linked or bundled. Chat sending was removed in 0.6.14.
+Its license is retained for historical provenance in
 third_party/mhw-toolkit/LICENSE.txt and runtime notices.
 
 - https://github.com/eigeen/mhw-toolkit/blob/main/src/game_export.rs

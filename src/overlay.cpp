@@ -15,7 +15,7 @@
 #include "weapon_icons.hpp"
 #include "dx11_surface.hpp"
 #include "process_com_ptr.hpp"
-#include "share_chat.hpp"
+#include "damage_summary.hpp"
 #include "game_icon_loader.hpp"
 #include "game_weapon_icons.hpp"
 
@@ -154,7 +154,6 @@ void settings() {
     visibility.automatic(c.autoShow);
     c.showKey=read(L"ShowKey",0x77);c.historyKey=read(L"HistoryKey",0x76);
     c.settingsKey=read(L"SettingsKey",0x75);c.moveKey=read(L"MoveKey",0x78);c.normalize();
-    c.chatOpenKey=read(L"ChatOpenKey",0x2d);c.normalize();
     const int savedX = static_cast<int>(GetPrivateProfileIntW(L"Overlay", L"PositionX", -1, iniPath.c_str()));
     const int savedY = static_cast<int>(GetPrivateProfileIntW(L"Overlay", L"PositionY", -1, iniPath.c_str()));
     if (savedX >= 0 && savedY >= 0) {
@@ -172,7 +171,7 @@ void saveSettings() {
         {L"ScalePercent",c.scale},{L"Opacity",c.opacity},{L"Width",c.width},{L"MaxRows",c.maxRows},
         {L"ShowDamage",c.damage},{L"ShowPercent",c.share},{L"ShowDps",c.dps},{L"ShowParticipation",c.time},
         {L"ShowComparison",c.comparison},{L"ShowKey",c.showKey},{L"HistoryKey",c.historyKey},
-        {L"SettingsKey",c.settingsKey},{L"MoveKey",c.moveKey},{L"ChatOpenKey",c.chatOpenKey},
+        {L"SettingsKey",c.settingsKey},{L"MoveKey",c.moveKey},
         {L"ShowBadge",c.showBadge},{L"AutoShow",c.autoShow}
     }};
     saveProfileAsync(values);

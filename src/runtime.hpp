@@ -29,16 +29,11 @@ void setEditing(bool enabled);
 bool isEditing();
 void setInputHotspot(const RECT& rect);
 bool getEditPointer(POINT& clientPoint, bool& leftDown);
-bool beginDamageChat(HWND window,const HuntRecord& record,int openKey);
-void tickDamageChat();
-bool damageChatBusy();
-enum class ChatResult;
-bool takeDamageChatResult(ChatResult& result);
 bool copyDamageSummary(HWND window,const HuntRecord& record);
 void startHistoryStore(const std::wstring& directory);
 bool takeLoadedHistory(History& history);
 void saveHistoryAsync(const History& history,const HuntRecord& last);
 struct ProfileSetting {const wchar_t* key=nullptr;int value=0;};
-using ProfileSettings=std::array<ProfileSetting,18>;
+using ProfileSettings=std::array<ProfileSetting,17>;
 void saveProfileAsync(const ProfileSettings& values);
 }

@@ -31,7 +31,7 @@ int main(int argc,char** argv){
     r.timestamp=2000;history.add(r);saveHistoryAsync(history,r);
     ProfileSettings config{};
     config[0]={L"ScalePercent",125};config[1]={L"PositionX",2000};config[2]={L"ShowDps",0};
-    config[16]={L"ShowBadge",0};config[17]={L"AutoShow",0};
+    config[15]={L"ShowBadge",0};config[16]={L"AutoShow",0};
     saveProfileAsync(config);
     for(int i=0;i<400&&!diagnosticHistoryWrites();++i)Sleep(5);
     if(!diagnosticHistoryWrites())return 3;

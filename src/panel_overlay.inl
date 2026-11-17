@@ -61,24 +61,13 @@ void archiveCurrent(bool interrupted=false) {
     log("Hunt archived: serial=%llu players=%u duration=%llu ms",archivedSerial,record.partySize,record.durationMs);
 }
 void processAction(PendingAction command) {
-    if(command.action==Action::ShareChat||command.action==Action::CopyDamage) {
-        // A missed/transitional memory sample must not invalidate the same
-        // cached mission totals currently visible in the panel.
-        if(!canShareDamage(model,preview)) {
+    if(command.action==Action::CopyDamage) {
+        // Copy the cached totals even if a transitional sample is unavailable.
+        if(!canCopyDamage(model,preview)) {
             actionNotice=preview?tr(L"Exit preview to share real damage"):tr(L"No current damage available to share");
-            log("Damage share rejected: preview=%d phase=%d quest=%d total=%llu available=%d",
-                preview,static_cast<int>(model.phase()),model.questId(),model.total(),model.dataAvailable());
-        } else if(command.action==Action::CopyDamage) {
+        } else {
             actionNotice=copyDamageSummary(window,captureHunt(model,GetTickCount64(),0))?
                 tr(L"Summary copied to clipboard"):tr(L"Clipboard busy; try again");
-        } else if(damageChatBusy()) {
-            actionNotice=tr(L"A send attempt is already in progress");
-        } else {
-            const auto record=captureHunt(model,GetTickCount64(),0);
-            if(beginDamageChat(window,record,panel.config.chatOpenKey)) {
-                panel.page=PanelPage::Current;setEditing(false);
-                actionNotice=tr(L"Preparing damage summary");
-            } else actionNotice=tr(L"Chat busy or unavailable; you can copy the summary");
         }
         actionNoticeUntil=GetTickCount64()+5000;return;
     }
@@ -101,13 +90,6 @@ void poll() {
     if(previousLanguageRevision!=languageRevision.load()) {
         previousLanguageRevision=languageRevision.load();refreshRequested=true;
     }
-    tickDamageChat();
-    ChatResult chatResult;
-    if(takeDamageChatResult(chatResult)) {
-        actionNotice=chatResult==ChatResult::Completed?tr(L"Check chat: delivery unconfirmed"):
-            chatResult==ChatResult::Cancelled?tr(L"Send cancelled; you can copy the summary"):tr(L"Could not send; you can copy the summary");
-        actionNoticeUntil=GetTickCount64()+7000;refreshRequested=true;
-    }
     bool changed=refreshRequested;refreshRequested=false;
     if(actionNoticeUntil&&GetTickCount64()>=actionNoticeUntil) {
         actionNotice.clear();actionNoticeUntil=0;changed=true;
@@ -115,7 +97,7 @@ void poll() {
     if(pendingAction) {processAction(*pendingAction);pendingAction.reset();changed=true;}
     const auto& config=panel.config;
     visibility.automatic(config.autoShow);
-    if(GetForegroundWindow()==window&&!damageChatBusy()) {
+    if(GetForegroundWindow()==window) {
         if(pressed(config.showKey)) {
             if(GetAsyncKeyState(VK_CONTROL)&0x8000) {preview=!preview;panel.page=PanelPage::Current;}
             else {preview=false;visibility.toggle();if(!visibility.visible())setEditing(false);}

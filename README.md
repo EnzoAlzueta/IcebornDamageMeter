@@ -11,7 +11,8 @@ are unchanged. This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Development candidate: 0.6.13.** Includes saved settings to hide the DM shortcut
+**Development candidate: 0.6.14.** Removes in-game chat sending; the manual
+clipboard action remains available. Includes saved settings to hide the DM shortcut
 and use manual panel visibility. With the panel and shortcut hidden, GPU drawing
 is skipped; recording continues. It also includes an optional cumulative binary hunt archive
 for a future external analyzer. The UI still keeps ten hunts. Storage is handled
@@ -29,8 +30,7 @@ candidate still requires real-game validation before replacing the public beta.
 - Compact panel, live details, last hunt and ten-hunt history.
 - Mission names/objectives when available; generic investigations labeled clearly.
 - Scale 40–175%, width 260–640, opacity, visible rows and configurable controls.
-- Manual damage sharing through paced keyboard input or experimental direct chat;
-  explicit Copy summary alternative. Full names are kept when each entry fits.
+- Copy the current mission damage summary to the clipboard on request.
 - Automatic game-language detection, with offline translations in English,
   Spanish, Portuguese, French, German, Italian, Japanese, Korean, Simplified and
   Traditional Chinese, Russian, Polish and Arabic.
@@ -46,7 +46,7 @@ Close the game and open its local files from Steam.
 
 Never replace another mod's root or chain DLL. On update, preserve your INI and
 hunt history. See [the installation guide](packaging/INSTALL.md)
-for complete language/chat settings, updates, removal and troubleshooting.
+for complete language settings, updates, removal and troubleshooting.
 
 ## Default controls
 
@@ -79,8 +79,7 @@ The author and a friend tested 0.6.11 in-game and reported no further crashes.
 The release reduces repeated DX11 UI raster work, suspends drawing on focus loss
 or minimize and adds graphics diagnostics. The original ERR12 cause is not
 confirmed. Not every language, party size, GPU or loader combination has been
-independently validated. Direct chat remains optional and experimental;
-successful input processing is not proof of reception.
+independently validated.
 
 ## Build and contribute
 

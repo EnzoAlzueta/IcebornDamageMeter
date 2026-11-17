@@ -1,5 +1,22 @@
 # Validation status
 
+## 0.6.14 chat removal candidate — 2026-11-17
+
+Removed both in-game chat transports, the menu send action, the chat-key setting
+and send polling. The runtime no longer builds the chat input/memory writer.
+Manual clipboard reports retain their existing format. Old ChatTransport and
+ChatOpenKey INI entries are ignored; user settings/history need no migration.
+
+All 50 local tests passed, including DX11/DX12 rendering, shorter menu/settings
+layouts, clipboard report formatting, visibility recovery, settings persistence,
+recent history and cumulative archive integrity. The removed native-chat-only
+test accounts for the decrease from 51. The existing persistence fixture was
+adjusted to the 17 settings slots. Localization auditing passed for 100 English
+strings and twelve complete translation columns. Menu/settings diagnostic images
+were visually inspected. No game was launched or chat submitted during validation.
+Real-game validation of this candidate and the preceding archive/visibility
+changes remains pending; these checks do not measure game FPS.
+
 ## 0.6.13 visibility candidate — 2026-11-17
 
 ShowBadge and AutoShow default to enabled for compatibility. Both are saved by

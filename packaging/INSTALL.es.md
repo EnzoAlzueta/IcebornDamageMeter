@@ -47,7 +47,7 @@ El panel aparece automáticamente durante una misión. Controles predeterminados
 | F8 | Mostrar/ocultar |
 | Ctrl+F8 | Vista previa con datos de ejemplo |
 | F6 | Ajustes |
-| Ctrl+F6 | Menú y envío manual |
+| Ctrl+F6 | Menú y portapapeles |
 | F7 | Historial de cacerías |
 | Ctrl+F9 | Desbloquear/bloquear movimiento |
 
@@ -89,24 +89,15 @@ en Steam. Reiniciá el juego después de cambiarlo. Opciones manuales:
 Los títulos de misiones sin traducción aparecen en inglés. Se conservan los
 nombres de jugadores.
 
-## Compartir daño
+## Copiar resumen de daño
 
-Abrí el menú y elegí enviar el daño actual al chat. Los totales de la misión
-terminada siguen disponibles al volver a ciudad hasta que otra misión los reinicie.
-No se comparte daño vacío ni de vista previa. Copiar resumen permite llevar
-el informe al portapapeles mediante una acción explícita.
+Abrí el menú y elegí **Copiar resumen de daño** para llevar el informe de la
+misión actual al portapapeles. Los totales siguen disponibles al volver a
+ciudad hasta que otra misión los reinicie. No se copian datos de vista previa
+ni misiones sin daño. No se envía nada al chat del juego.
 
-Los ajustes nuevos usan `ChatTransport=keyboard` bajo `[Overlay]`, con escritura
-pausada. `ChatOpenKey=45` corresponde a Insert; `13`, a Enter. Usá la tecla
-asignada al chat del juego. Para el envío directo experimental sin escritura,
-cerrá el juego y poné `ChatTransport=native` en esa sección. Conservá el resto
-del INI. Ese modo protege otros borradores, no reintenta automáticamente ni
-cambia al transporte por teclado si falla.
-
-Usá una sesión online y el canal deseado. Esperá al menos 15 segundos entre
-solicitudes. Un grupo largo puede requerir varios mensajes. Confirmá recepción
-con otro jugador: el estado local no garantiza entrega. Solo se comparte
-cuando lo pedís.
+Se retiró el envío por chat. Las entradas antiguas `ChatTransport` y
+`ChatOpenKey` del INI se ignoran; no hace falta modificar tu configuración.
 
 ## Limitaciones y problemas
 

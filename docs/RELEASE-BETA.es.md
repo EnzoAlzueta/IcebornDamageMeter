@@ -1,3 +1,6 @@
+> Borrador histórico. La versión de desarrollo 0.6.14 retira el envío por chat;
+> consultá la guía de instalación vigente para copiar resúmenes.
+
 # Iceborne Damage Meter 0.6.10 — beta pública (borrador)
 
 [English primary draft](RELEASE-BETA.md). La 0.6.10 estandariza los textos base

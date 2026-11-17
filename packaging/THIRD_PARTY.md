@@ -23,7 +23,7 @@ third-party components.
 - HunterPie, Apache-2.0: game memory layouts for player, party, quest and stage
   fields. Its bypass/patch routines are not included.
   https://github.com/HunterPie/HunterPie
-- mhw-toolkit, Copyright 2024 Eigeen, Apache-2.0: native chat field layouts.
+- mhw-toolkit, Copyright 2024 Eigeen, Apache-2.0: historical native chat field layouts (chat sending removed in 0.6.14).
   The toolkit library is not bundled or linked.
   [Reference license](licenses/mhw-toolkit-REFERENCE-LICENSE.txt).
   https://github.com/eigeen/mhw-toolkit

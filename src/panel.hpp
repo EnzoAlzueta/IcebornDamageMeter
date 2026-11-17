@@ -9,11 +9,10 @@ struct PanelConfig {
     int scale=100,opacity=92,width=460,maxRows=4;
     bool damage=true,share=true,dps=true,time=true,comparison=true;
     bool showBadge=true,autoShow=true;
-    int showKey=0x77,historyKey=0x76,settingsKey=0x75,moveKey=0x78,chatOpenKey=0x2d;
+    int showKey=0x77,historyKey=0x76,settingsKey=0x75,moveKey=0x78;
     void normalize() {
         scale=std::clamp(scale,40,175); opacity=std::clamp(opacity,55,100);
         width=std::clamp(width,260,640); maxRows=std::clamp(maxRows,4,16);
-        if(chatOpenKey!=0x2d&&chatOpenKey!=0x0d)chatOpenKey=0x2d;
         int* keys[]={&showKey,&historyKey,&settingsKey,&moveKey};
         const int defaults[]={0x77,0x76,0x75,0x78};
         for(int i=0;i<4;++i) {
@@ -41,7 +40,7 @@ inline const wchar_t* outcomeName(int outcome) {
     return tr(L"Ended");
 }
 enum class PanelPage { Current, Details, Record, History, Settings, Menu };
-enum class Action { Current, Details, Last, History, Settings, Menu, Move, Close, SelectRecord, Older, Newer, Decrease, Increase, ShareChat, CopyDamage };
+enum class Action { Current, Details, Last, History, Settings, Menu, Move, Close, SelectRecord, Older, Newer, Decrease, Increase, CopyDamage };
 struct UiButton { Rect rect; std::wstring text; Action action=Action::Current; int data=0; bool selected=false; };
 struct UiRow {
     std::wstring name,value;
@@ -129,9 +128,8 @@ public:
             case 10:changeKey(config.historyKey,d);break;
             case 11:changeKey(config.settingsKey,d);break;
             case 12:changeKey(config.moveKey,d);break;
-            case 13:config.chatOpenKey=config.chatOpenKey==0x2d?0x0d:0x2d;break;
-            case 14:config.showBadge=!config.showBadge;break;
-            case 15:config.autoShow=!config.autoShow;break;
+            case 13:config.showBadge=!config.showBadge;break;
+            case 14:config.autoShow=!config.autoShow;break;
             }
             config.normalize(); return true;
         }
@@ -150,11 +148,11 @@ public:
         view.button({width-28,view.compact?1.0f:4.0f,24,view.compact?20.0f:24.0f},L"≡",Action::Menu);
         if(page==PanelPage::Menu) {
             view.menu=true;view.title=tr(L"LOG · MENU");view.bodyTop=42;view.rowHeight=view.narrow?44.0f:25.0f;
-            const wchar_t* labels[]={tr(L"Current quest details"),tr(L"Last hunt"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Hide panel"),tr(L"Share current damage in chat"),tr(L"Copy damage summary")};
+            const wchar_t* labels[]={tr(L"Current quest details"),tr(L"Last hunt"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Hide panel"),tr(L"Copy damage summary")};
             const std::wstring hints[]={tr(L"DPS & comparison"),L"",keyName(config.historyKey),keyName(config.settingsKey),
-                L"Ctrl+"+keyName(config.moveKey),keyName(config.showKey),tr(L"Current channel"),tr(L"Clipboard")};
-            const Action actions[]={Action::Details,Action::Last,Action::History,Action::Settings,Action::Move,Action::Close,Action::ShareChat,Action::CopyDamage};
-            for(int i=0;i<8;++i) {
+                L"Ctrl+"+keyName(config.moveKey),keyName(config.showKey),tr(L"Clipboard")};
+            const Action actions[]={Action::Details,Action::Last,Action::History,Action::Settings,Action::Move,Action::Close,Action::CopyDamage};
+            for(int i=0;i<7;++i) {
                 auto& row=view.rows[view.rowCount++];row.name=labels[i];row.value=hints[i];row.colored=false;
                 view.button({10,view.bodyTop+i*view.rowHeight,width-20,view.rowHeight-2},L"",actions[i]);
             }
@@ -162,9 +160,9 @@ public:
         } else if(page==PanelPage::Settings) {
             view.settings=true;view.rowHeight=view.narrow?44.0f:25.0f;view.bodyTop=42;view.title=tr(L"LOG · SETTINGS");
             const wchar_t* labels[]={tr(L"Scale"),tr(L"Opacity"),tr(L"Width"),tr(L"Total damage"),tr(L"Percentage"),tr(L"Observed DPS"),
-                tr(L"Participation time"),tr(L"Personal comparison"),tr(L"Visible rows"),tr(L"Show / hide"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Game chat key"),tr(L"Show DM button"),tr(L"Show on quest start")};
+                tr(L"Participation time"),tr(L"Personal comparison"),tr(L"Visible rows"),tr(L"Show / hide"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Show DM button"),tr(L"Show on quest start")};
             const bool flags[]={config.damage,config.share,config.dps,config.time,config.comparison};
-            for(int i=0;i<16;++i) {
+            for(int i=0;i<15;++i) {
                 auto& row=view.rows[view.rowCount++];row.name=labels[i];row.colored=false;
                 if(i==0)row.value=std::to_wstring(config.scale)+L"%";
                 if(i==1)row.value=std::to_wstring(config.opacity)+L"%";
@@ -175,9 +173,8 @@ public:
                 if(i==10)row.value=keyName(config.historyKey);
                 if(i==11)row.value=keyName(config.settingsKey);
                 if(i==12)row.value=L"Ctrl+"+keyName(config.moveKey);
-                if(i==13)row.value=config.chatOpenKey==0x2d?L"Insert":L"Enter";
-                if(i==14)row.value=config.showBadge?tr(L"Yes"):tr(L"No");
-                if(i==15)row.value=config.autoShow?tr(L"Yes"):tr(L"No");
+                if(i==13)row.value=config.showBadge?tr(L"Yes"):tr(L"No");
+                if(i==14)row.value=config.autoShow?tr(L"Yes"):tr(L"No");
                 const float y=view.bodyTop+i*view.rowHeight+(view.narrow?20.0f:0.0f);
                 view.button({width-66,y+1,24,22},L"−",Action::Decrease,i);
                 view.button({width-36,y+1,24,22},L"+",Action::Increase,i);

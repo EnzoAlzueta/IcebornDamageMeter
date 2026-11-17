@@ -55,7 +55,7 @@ int main(){
     }
     {
         Panel panel;Meter m;auto view=panel.build(m,0);CHECK(view.rowCount==0);
-        panel.change(Action::Settings);view=panel.build(m,0);CHECK(view.settings && view.rowCount==16);
+        panel.change(Action::Settings);view=panel.build(m,0);CHECK(view.settings && view.rowCount==15);
         const int old=panel.config.scale;CHECK(panel.change(Action::Increase,0));CHECK(panel.config.scale==old+5);
         panel.change(Action::Increase,5);CHECK(!panel.config.dps);
         for(int i=0;i<100;++i)panel.change(Action::Increase,0);CHECK(panel.config.scale==175);
@@ -66,7 +66,7 @@ int main(){
         CHECK(view.compact && view.footer.empty() && view.columns.empty() && view.buttonCount==1);
         m.update(sample(1,0),0);m.update(sample(2,0),100);
         view=panel.build(m,100);CHECK(view.rowCount==1 && view.height<60);
-        panel.change(Action::Menu);view=panel.build(m,100);CHECK(view.menu && view.rowCount==8);
+        panel.change(Action::Menu);view=panel.build(m,100);CHECK(view.menu && view.rowCount==7);
         bool details=false,history=false,settings=false;
         for(size_t i=0;i<view.buttonCount;++i) {
             const auto action=view.buttons[i].action;

@@ -1,3 +1,6 @@
+> Historical release draft. Development version 0.6.14 removes chat sending;
+> see the current installation guide for clipboard summaries.
+
 # Iceborne Damage Meter 0.6.11 — prepared public beta
 
 [Español](RELEASE-BETA.es.md) · [Installation](../INSTALL.md)

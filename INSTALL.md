@@ -72,28 +72,15 @@ Optional overrides: `en`, `es`, `pt-BR`, `fr`, `de`, `it`, `ja`, `ko`, `zh-CN`,
 Missing quest translations use English; the upstream quest catalog has no
 Simplified Chinese titles. Player names and saved data are preserved.
 
-## Share damage
+## Copy damage summary
 
-Open the menu and select the current-damage chat action. Sharing uses actual
-recorded totals, including the completed mission after returning to town, until
-a new mission resets the meter. Preview and empty missions cannot be shared.
-Generic investigation ID 30000 is labeled Investigation; no target is guessed.
+Open the menu and choose **Copy damage summary** to copy the current mission's
+report to the clipboard. Recorded totals remain available after returning to
+town until a new mission resets the meter. Preview data and empty missions
+cannot be copied. Nothing is sent to the game chat.
 
-Under `[Overlay]`, `ChatTransport=keyboard` uses paced normal input; set
-`ChatOpenKey=45` for Insert or `13` for Enter to match the game controls.
-`ChatTransport=native` selects experimental direct submission without opening
-chat or typing. It was user-tested on the local installation, including town
-sharing; other configurations still need validation. Existing nonempty drafts,
-active entry and uncertain sends remain protected. No automatic keyboard fallback.
-
-Use an online session and the intended game chat channel. Wait at least 15 seconds
-between requests and confirm reception with another player. Escape/focus loss
-cancels pending work; an already submitted request cannot be recalled. Names are
-preserved when each entry fits. Long groups can require several bounded messages.
-An input completion or consumed request flag does not certify network delivery.
-
-Copy damage summary explicitly copies the fuller report to the clipboard. Neither
-chat transport modifies the clipboard. Sharing only occurs on a user action.
+Chat sending has been removed. Old `ChatTransport` and `ChatOpenKey` entries in
+an existing INI are ignored; no configuration changes are required.
 
 ## Limitations and troubleshooting
 
