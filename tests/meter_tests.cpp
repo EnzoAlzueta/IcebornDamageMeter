@@ -109,6 +109,15 @@ int main() {
         v.update(sample(2, 43)); CHECK(v.visible());
     }
     {
+        Visibility visibility;
+        visibility.automatic(false);visibility.update(sample());CHECK(!visibility.visible());
+        visibility.toggle();CHECK(visibility.visible());
+        visibility.update(sample(2,43));CHECK(visibility.visible());
+        visibility.hide();visibility.update(sample(0,0));visibility.update(sample());CHECK(!visibility.visible());
+        visibility.automatic(true);CHECK(visibility.visible());
+        visibility.automatic(false);CHECK(!visibility.visible());
+    }
+    {
         RelativeCursor cursor;
         cursor.reset(400, 300, 800, 600);
         cursor.move(130, -70);

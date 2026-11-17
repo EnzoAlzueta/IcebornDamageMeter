@@ -39,5 +39,6 @@ void startHistoryStore(const std::wstring& directory);
 bool takeLoadedHistory(History& history);
 void saveHistoryAsync(const History& history,const HuntRecord& last);
 struct ProfileSetting {const wchar_t* key=nullptr;int value=0;};
-void saveProfileAsync(const std::array<ProfileSetting,16>& values);
+using ProfileSettings=std::array<ProfileSetting,18>;
+void saveProfileAsync(const ProfileSettings& values);
 }

@@ -114,6 +114,7 @@ void poll() {
     }
     if(pendingAction) {processAction(*pendingAction);pendingAction.reset();changed=true;}
     const auto& config=panel.config;
+    visibility.automatic(config.autoShow);
     if(GetForegroundWindow()==window&&!damageChatBusy()) {
         if(pressed(config.showKey)) {
             if(GetAsyncKeyState(VK_CONTROL)&0x8000) {preview=!preview;panel.page=PanelPage::Current;}

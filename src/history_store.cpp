@@ -18,7 +18,7 @@ unsigned archiveDropped=0;
 std::atomic<bool> archiveEnabled{true};
 bool loaded=false,pending=false;
 bool profilePending=false;
-std::array<ProfileSetting,16> pendingProfile{};
+ProfileSettings pendingProfile{};
 std::wstring storeFolder;
 std::atomic<unsigned> completedWrites{0};
 std::atomic<unsigned> completedProfiles{0};
@@ -56,7 +56,7 @@ DWORD WINAPI historyWorker(void*) {
     for(;;) {
         if(WaitForSingleObject(storeEvent,INFINITE)!=WAIT_OBJECT_0) return 0;
         for(;;){
-        History toSave; HuntRecord last;std::array<ProfileSetting,16> profile{};
+        History toSave; HuntRecord last;ProfileSettings profile{};
         HuntRecord toArchive;bool writeArchive=false;unsigned dropped=0;
         bool writeHistory=false,writeProfile=false;
         { std::lock_guard<std::mutex> lock(storeMutex); if(!pending&&!profilePending&&!archiveCount&&!archiveDropped){storageIdle.store(true);break;}
@@ -131,7 +131,7 @@ void saveHistoryAsync(const History& history,const HuntRecord& last) {
       } }
     SetEvent(storeEvent);
 }
-void saveProfileAsync(const std::array<ProfileSetting,16>& values) {
+void saveProfileAsync(const ProfileSettings& values) {
     if(!storeEvent)return;
     {std::lock_guard<std::mutex> lock(storeMutex);storageIdle.store(false);pendingProfile=values;profilePending=true;}
     SetEvent(storeEvent);

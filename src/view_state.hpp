@@ -22,18 +22,20 @@ class Visibility {
     enum class Manual { Auto, Show, Hide };
     Manual manual_ = Manual::Auto;
     bool inQuest_ = false, missionArea_ = false;
+    bool automatic_ = true;
     int quest_ = 0;
 public:
+    void automatic(bool enabled){if(automatic_!=enabled){automatic_=enabled;manual_=Manual::Auto;}}
     void update(const Sample& sample) {
         if (!sample.valid) return;
         const bool live = sample.expedition || (sample.questId > 0 && sample.state == 2);
         const int context=sample.expedition?-1:sample.questId;
-        if (live && (!inQuest_ || context != quest_)) manual_ = Manual::Auto;
+        if (automatic_ && live && (!inQuest_ || context != quest_)) manual_ = Manual::Auto;
         inQuest_ = live;
         quest_ = context;
         missionArea_ = sample.expedition || (sample.questId > 0 && sample.state >= 2 && sample.state <= 5);
     }
-    bool visible() const { return manual_ == Manual::Show || (manual_ == Manual::Auto && missionArea_); }
+    bool visible() const { return manual_ == Manual::Show || (automatic_ && manual_ == Manual::Auto && missionArea_); }
     void toggle() { manual_ = visible() ? Manual::Hide : Manual::Show; }
     void hide() { manual_ = Manual::Hide; }
 };

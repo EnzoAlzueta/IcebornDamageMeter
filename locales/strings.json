@@ -1526,6 +1526,34 @@
       "‹ Новее",
       "‹ Nowsze",
       "‹ الأحدث"
+    ],
+    "Show DM button": [
+      "Mostrar botón DM",
+      "Mostrar botão DM",
+      "Afficher le bouton DM",
+      "DM-Schaltfläche anzeigen",
+      "Mostra pulsante DM",
+      "DMボタンを表示",
+      "DM 버튼 표시",
+      "显示 DM 按钮",
+      "顯示 DM 按鈕",
+      "Показывать кнопку DM",
+      "Pokaż przycisk DM",
+      "إظهار زر DM"
+    ],
+    "Show on quest start": [
+      "Mostrar al iniciar misión",
+      "Mostrar ao iniciar missão",
+      "Afficher au début de quête",
+      "Bei Questbeginn anzeigen",
+      "Mostra a inizio missione",
+      "クエスト開始時に表示",
+      "퀘스트 시작 시 표시",
+      "任务开始时显示",
+      "任務開始時顯示",
+      "Показывать в начале задания",
+      "Pokaż na początku zadania",
+      "إظهار عند بدء المهمة"
     ]
   }
 }

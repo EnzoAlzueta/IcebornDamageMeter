@@ -29,8 +29,9 @@ int main(int argc,char** argv){
     for(int i=0;i<200&&!ready;++i){ready=takeLoadedHistory(loaded);if(!ready)Sleep(5);}
     if(!ready||loaded.size()!=1||loaded.get(0)->players[0].name!=r.players[0].name)return 2;
     r.timestamp=2000;history.add(r);saveHistoryAsync(history,r);
-    std::array<ProfileSetting,16> config{};
+    ProfileSettings config{};
     config[0]={L"ScalePercent",125};config[1]={L"PositionX",2000};config[2]={L"ShowDps",0};
+    config[16]={L"ShowBadge",0};config[17]={L"AutoShow",0};
     saveProfileAsync(config);
     for(int i=0;i<400&&!diagnosticHistoryWrites();++i)Sleep(5);
     if(!diagnosticHistoryWrites())return 3;
@@ -41,7 +42,9 @@ int main(int argc,char** argv){
     const auto ini=(directory/L"iceborne_damage_meter.ini").wstring();
     if(!diagnosticProfileWrites()||GetPrivateProfileIntW(L"Overlay",L"ScalePercent",0,ini.c_str())!=125||
         GetPrivateProfileIntW(L"Overlay",L"PositionX",0,ini.c_str())!=2000||
-        GetPrivateProfileIntW(L"Overlay",L"ShowDps",1,ini.c_str())!=0)return 7;
+        GetPrivateProfileIntW(L"Overlay",L"ShowDps",1,ini.c_str())!=0||
+        GetPrivateProfileIntW(L"Overlay",L"ShowBadge",1,ini.c_str())!=0||
+        GetPrivateProfileIntW(L"Overlay",L"AutoShow",1,ini.c_str())!=0)return 7;
     // Several queued hunts must survive even if the ten-entry snapshot is coalesced.
     for(unsigned i=0;i<20;++i){r.timestamp=3000+i;history.add(r);saveHistoryAsync(history,r);}
     for(unsigned i=0;i<2000&&!diagnosticStorageIdle();++i)Sleep(5);

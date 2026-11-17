@@ -17,6 +17,7 @@ unsigned diagnosticCacheBuilds();
 unsigned diagnosticDx11Composites();
 unsigned diagnosticDx11Rasterizations();
 void diagnosticFocus(bool);
+void diagnosticHidden(bool);
 void diagnosticPanelPage(int);
 void diagnosticPanelSize(int,int);
 void diagnosticRecapture(void*,IUnknown*);
@@ -58,6 +59,7 @@ int main(int argc,char** argv) {
     const bool narrow=mode.find("narrow")!=std::string::npos;
     const bool tinyScale=mode=="small";
     const bool focusTest=mode=="focus";
+    const bool hiddenTest=mode=="hidden";
     const bool localeJapanese=mode=="locale-ja",localeArabic=mode=="locale-ar";
     const bool bgra=mode.find("bgra")!=std::string::npos;
     const bool copied=mode.find("copied")!=std::string::npos;
@@ -105,7 +107,10 @@ int main(int argc,char** argv) {
         D3D11_BUFFER_DESC bd{};bd.ByteWidth=64;bd.Usage=D3D11_USAGE_DEFAULT;bd.BindFlags=D3D11_BIND_CONSTANT_BUFFER;
         ComPtr<ID3D11Buffer> constant;require(device->CreateBuffer(&bd,nullptr,&constant),"Sentinel constant");
         bool pixelsBefore=false,pixelsAfter=false;
+        if(hiddenTest)meter::diagnosticHidden(true);
         for(UINT frame=0;frame<36;++frame) {
+            const bool hiddenFrame=hiddenTest&&(frame<2||(frame>=5&&frame<16));
+            if(hiddenTest&&(frame==2||frame==5||frame==16))meter::diagnosticHidden(frame==5);
             const bool unfocusedFrame=focusTest&&frame>=5&&frame<10;
             meter::diagnosticFocus(!unfocusedFrame);
             const auto compositesBefore=meter::diagnosticDx11Composites();
@@ -122,7 +127,7 @@ int main(int argc,char** argv) {
                 ComPtr<IDXGISwapChain1> modern;require(chain.As(&modern),"Present1 interface");
                 const DXGI_PRESENT_PARAMETERS parameters{};require(modern->Present1(0,0,&parameters),"Present1");
             } else require(chain->Present(0,0),"Present");
-            if(!meter::diagnosticReady())throw std::runtime_error("DX11 overlay did not initialize");
+            if(!hiddenFrame&&!meter::diagnosticReady())throw std::runtime_error("DX11 overlay did not initialize");
             D3D11_VIEWPORT after{};UINT count=1;context->RSGetViewports(&count,&after);
             D3D11_PRIMITIVE_TOPOLOGY topology{};context->IAGetPrimitiveTopology(&topology);
             ComPtr<ID3D11SamplerState> restored;context->PSGetSamplers(5,1,&restored);
@@ -133,6 +138,8 @@ int main(int argc,char** argv) {
             const std::string file="preview-dx11-"+mode+".bmp";
             const bool pixels=renderedPixels(device.Get(),context.Get(),back.Get(),frame==10?file.c_str():nullptr);
             if(unfocusedFrame&&(pixels||meter::diagnosticDx11Composites()!=compositesBefore))throw std::runtime_error("Meter rendered while unfocused");
+            if(hiddenFrame&&(pixels||meter::diagnosticDx11Composites()!=compositesBefore))throw std::runtime_error("Hidden meter still rendered a panel or DM badge");
+            if(hiddenTest&&frame==16&&!pixels)throw std::runtime_error("Hidden meter did not recover after visibility toggle");
             if(focusTest&&frame==10&&!pixels)throw std::runtime_error("Meter did not resume after focus restoration");
             if(frame<12)pixelsBefore|=pixels;else pixelsAfter|=pixels;
             context->ClearState();output.Reset();back.Reset();
@@ -140,7 +147,7 @@ int main(int argc,char** argv) {
             if(frame==23)require(chain->ResizeBuffers(flip?2:1,800,600,DXGI_FORMAT_R8G8B8A8_UNORM,0),"Resize back");
         }
         if(!pixelsBefore||!pixelsAfter||meter::diagnosticDx11Composites()<3)throw std::runtime_error("No UI pixels/composites around resize");
-        if(meter::diagnosticCacheBuilds()!=1)throw std::runtime_error("Static UI cache rebuilt");
+        if(hiddenTest?meter::diagnosticCacheBuilds()<2:meter::diagnosticCacheBuilds()!=1)throw std::runtime_error("Unexpected UI cache rebuild count");
         if(meter::diagnosticDx11Rasterizations()<3||meter::diagnosticDx11Rasterizations()>=meter::diagnosticDx11Composites())
             throw std::runtime_error("DX11 static raster was not reused across frames/resizes");
         std::printf("DX11 rasterizations: %u; composites: %u (includes two resizes).\n",meter::diagnosticDx11Rasterizations(),meter::diagnosticDx11Composites());

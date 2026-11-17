@@ -57,6 +57,15 @@ El DPS incluye el tiempo presente, con viajes y pausas; no mide tiempo de ataque
 activo ni una puntuación de habilidad. En misiones con varios objetivos, el daño
 corresponde a la misión completa.
 
+F6 también permite cambiar **Mostrar botón DM** y **Mostrar al iniciar misión**.
+Desactivá la primera para quitar el pequeño acceso DM cuando ocultás el panel.
+Desactivá la segunda para iniciar oculto y manejarlo con la tecla entre misiones.
+Ambas opciones se guardan. Con las dos apagadas, F8 (o tu tecla configurada)
+sigue abriendo el panel; F6, F7 y Ctrl+F6 abren sus páginas. Se sigue registrando
+daño e historial mientras está oculto, sin dibujar el panel ni el botón en la GPU.
+
+Opciones equivalentes bajo `[Overlay]` en el INI: `ShowBadge=0` y `AutoShow=0`.
+
 ## Archivo de cacerías a largo plazo
 
 `ArchiveHunts=1` bajo `[Overlay]` activa el archivo

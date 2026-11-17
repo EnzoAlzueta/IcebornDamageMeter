@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.13 (candidate)
+
+- Add saved settings to hide the small DM shortcut and disable automatic panel
+  opening at quest start. Defaults preserve the previous behavior.
+- Keep the show/hide, settings, menu and history keys available with the DM
+  shortcut hidden. Manual visibility remains under user control across quests
+  when automatic opening is disabled; a new session starts hidden in that mode.
+- Skip GPU initialization/drawing and clear the input hotspot when no panel or
+  shortcut is visible. Damage/history/archive recording continues normally.
+- Localize the two settings in all thirteen interface languages; add DX11/DX12
+  pixel checks for hidden startup, resize while hidden and visibility recovery.
+- Include the cumulative archive introduced in the preceding 0.6.12 candidate.
+
 ## 0.6.12 (candidate)
 
 - Add an optional cumulative binary hunt archive for future external analysis;

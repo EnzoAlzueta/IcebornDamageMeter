@@ -8,6 +8,7 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include <cmath>
 #include "external_overlay.hpp"
 using Microsoft::WRL::ComPtr;
 namespace meter {
@@ -17,6 +18,7 @@ void diagnosticRelativeMotion(LONG dx, LONG dy);
 unsigned diagnosticCacheBuilds();
 void diagnosticPanelPage(int page);
 void diagnosticPanelSize(int,int);
+void diagnosticHidden(bool);
 void diagnosticRecapture(void*,IUnknown*);
 }
 static void require(HRESULT result, const char* operation) {
@@ -76,7 +78,7 @@ static void testEditing(HWND window) {
     const auto restore = hadOriginal ? original : remove;
     if (!RegisterRawInputDevices(&restore, 1, sizeof(restore))) throw std::runtime_error("Restore harness mouse registration");
 }
-static void savePreview(ID3D12Device* device, ID3D12CommandQueue* queue, IDXGISwapChain1* chain, UINT index, const char* fileName) {
+static void savePreview(ID3D12Device* device, ID3D12CommandQueue* queue, IDXGISwapChain1* chain, UINT index, const char* fileName,int expected=-1) {
     ComPtr<ID3D12Resource> source, readback;
     require(chain->GetBuffer(index, IID_PPV_ARGS(&source)), "Preview GetBuffer");
     const auto sourceDesc = source->GetDesc();
@@ -120,12 +122,17 @@ static void savePreview(ID3D12Device* device, ID3D12CommandQueue* queue, IDXGISw
     require(readback->Map(0, &range, &pixels), "Preview map");
     const auto width = static_cast<UINT>(sourceDesc.Width), height = sourceDesc.Height;
     std::vector<BYTE> bitmap(static_cast<size_t>(width)*height*4);
+    unsigned changed=0;
     for (UINT y = 0; y < height; ++y) for (UINT x = 0; x < width; ++x) {
         const auto input = static_cast<BYTE*>(pixels) + y*footprint.Footprint.RowPitch + x*4;
         auto output = bitmap.data() + (static_cast<size_t>(y)*width+x)*4;
         output[0] = input[2]; output[1] = input[1]; output[2] = input[0]; output[3] = 255;
+        if(input[0]>8||input[1]>8||input[2]>8)++changed;
     }
     readback->Unmap(0, nullptr);
+    if(expected==0&&changed)throw std::runtime_error("Hidden DX12 meter still rendered pixels");
+    if(expected==1&&changed<300)throw std::runtime_error("DX12 meter did not recover after visibility toggle");
+    if(!fileName)return;
     BITMAPFILEHEADER fileHeader{}; fileHeader.bfType = 0x4d42;
     fileHeader.bfOffBits = sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
     fileHeader.bfSize = fileHeader.bfOffBits + static_cast<DWORD>(bitmap.size());
@@ -150,6 +157,7 @@ int main(int argc, char** argv) {
     const bool localeJapanese=argc>1&&std::strcmp(argv[1],"--locale-ja")==0;
     const bool localeArabic=argc>1&&std::strcmp(argv[1],"--locale-ar")==0;
     const bool localeSwitch=argc>1&&std::strcmp(argv[1],"--locale-switch")==0;
+    const bool hiddenTest=argc>1&&std::strcmp(argv[1],"--hidden")==0;
     const bool record = argc > 1 && std::strcmp(argv[1], "--record") == 0;
     const bool menu = argc > 1 && std::strcmp(argv[1], "--menu") == 0;
     HWND window = nullptr;
@@ -223,24 +231,39 @@ int main(int argc, char** argv) {
         require(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)), "CreateFence");
         event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
         if (!event) throw std::runtime_error("CreateEvent");
+        ComPtr<ID3D12DescriptorHeap> visibilityHeap;
+        if(hiddenTest){D3D12_DESCRIPTOR_HEAP_DESC heap{};heap.Type=D3D12_DESCRIPTOR_HEAP_TYPE_RTV;heap.NumDescriptors=1;
+            require(device->CreateDescriptorHeap(&heap,IID_PPV_ARGS(&visibilityHeap)),"Visibility RTV heap");meter::diagnosticHidden(true);}
         for (UINT64 frame = 1; frame <= 12; ++frame) {
+            const bool hiddenFrame=hiddenTest&&(frame<=2||(frame>=5&&frame<10));
+            if(hiddenTest&&(frame==3||frame==5||frame==10))meter::diagnosticHidden(frame==5);
             if(localeSwitch&&frame==6)meter::setLanguage(meter::Language::Spanish);
             ComPtr<IDXGISwapChain3> indexed; require(chain.As(&indexed), "Indexed swapchain");
             const UINT renderedIndex = indexed->GetCurrentBackBufferIndex();
+            if(hiddenTest){
+                require(allocator->Reset(),"Visibility allocator reset");require(commandList->Reset(allocator.Get(),nullptr),"Visibility list reset");
+                ComPtr<ID3D12Resource> back;require(chain->GetBuffer(renderedIndex,IID_PPV_ARGS(&back)),"Visibility backbuffer");
+                const auto rtv=visibilityHeap->GetCPUDescriptorHandleForHeapStart();device->CreateRenderTargetView(back.Get(),nullptr,rtv);
+                D3D12_RESOURCE_BARRIER barrier{};barrier.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;barrier.Transition.pResource=back.Get();
+                barrier.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;barrier.Transition.StateBefore=D3D12_RESOURCE_STATE_PRESENT;barrier.Transition.StateAfter=D3D12_RESOURCE_STATE_RENDER_TARGET;
+                commandList->ResourceBarrier(1,&barrier);const float clear[4]={0,0,0,1};commandList->ClearRenderTargetView(rtv,clear,0,nullptr);
+                std::swap(barrier.Transition.StateBefore,barrier.Transition.StateAfter);commandList->ResourceBarrier(1,&barrier);require(commandList->Close(),"Visibility list close");
+            }
             ID3D12CommandList* lists[] = {commandList.Get()};
             queue->ExecuteCommandLists(1, lists);
             require(chain->Present(0, 0), "Present");
             require(queue->Signal(fence.Get(), frame), "Signal");
             require(fence->SetEventOnCompletion(frame, event), "SetEventOnCompletion");
             if (WaitForSingleObject(event, 10000) != WAIT_OBJECT_0) throw std::runtime_error("GPU timeout");
-            if (!meter::diagnosticReady()) throw std::runtime_error("Overlay did not initialize");
-            if (frame == 1 && !late) savePreview(device.Get(), queue.Get(), chain.Get(), renderedIndex,
+            if (!hiddenFrame&&!meter::diagnosticReady()) throw std::runtime_error("Overlay did not initialize");
+            if(hiddenTest&&(frame==1||frame==2||frame==3||frame==5||frame==9||frame==10))savePreview(device.Get(),queue.Get(),chain.Get(),renderedIndex,nullptr,hiddenFrame?0:1);
+            if (frame == 1 && !late&&!hiddenTest) savePreview(device.Get(), queue.Get(), chain.Get(), renderedIndex,
                 narrow||tinyScale||localeJapanese||localeArabic||localeSwitch?(std::string("preview-dx12-")+argv[1]+".bmp").c_str():settings?"preview-settings.bmp":history?"preview-history.bmp":record?"preview-record.bmp":menu?"preview-menu.bmp":
                 zeroDamage ? "preview-zero.bmp" : gallery?"preview.bmp":"preview-compact.bmp");
             if (frame == 4) require(chain->ResizeBuffers(2, 1024, 768, DXGI_FORMAT_R8G8B8A8_UNORM, 0), "ResizeBuffers");
             if (frame == 8) require(chain->ResizeBuffers(2, 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, 0), "ResizeBuffers back");
         }
-        if(meter::diagnosticCacheBuilds()!=(localeSwitch?2U:1U))throw std::runtime_error("Unexpected UI cache rebuild count");
+        if(hiddenTest?meter::diagnosticCacheBuilds()<2:meter::diagnosticCacheBuilds()!=(localeSwitch?2U:1U))throw std::runtime_error("Unexpected UI cache rebuild count");
         std::printf("UI cache: %u build(s) across 12 frames and two resizes.\n",meter::diagnosticCacheBuilds());
         testEditing(window);
         meter::shutdownOverlay();

@@ -55,6 +55,15 @@ Existing INI key bindings are preserved. Settings include scale 40–175%, width
 Observed DPS includes time present, including travel and pauses; it is not active
 attack time or a normalized skill score. Multi-target quests show mission totals.
 
+F6 also offers **Show DM button** and **Show on quest start**. Turn off the first
+to remove the small DM shortcut while the panel is hidden. Turn off the second
+to start hidden and use the show/hide key manually across quests. Both settings
+are saved. With both off, F8 (or your configured show/hide key) still opens the
+panel; F6, F7 and Ctrl+F6 also open their respective pages. Recording continues
+while hidden. No panel/badge GPU drawing occurs when both are hidden.
+
+INI equivalents under `[Overlay]`: `ShowBadge=0` and `AutoShow=0`.
+
 ## Long-term hunt archive
 
 `ArchiveHunts=1` under `[Overlay]` enables

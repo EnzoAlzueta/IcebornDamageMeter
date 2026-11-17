@@ -150,6 +150,8 @@ void settings() {
     c.opacity=read(L"Opacity",92);c.width=read(L"Width",460);c.maxRows=read(L"MaxRows",4);
     c.damage=read(L"ShowDamage",1)!=0;c.share=read(L"ShowPercent",1)!=0;c.dps=read(L"ShowDps",1)!=0;
     c.time=read(L"ShowParticipation",1)!=0;c.comparison=read(L"ShowComparison",1)!=0;
+    c.showBadge=read(L"ShowBadge",1)!=0;c.autoShow=read(L"AutoShow",1)!=0;
+    visibility.automatic(c.autoShow);
     c.showKey=read(L"ShowKey",0x77);c.historyKey=read(L"HistoryKey",0x76);
     c.settingsKey=read(L"SettingsKey",0x75);c.moveKey=read(L"MoveKey",0x78);c.normalize();
     c.chatOpenKey=read(L"ChatOpenKey",0x2d);c.normalize();
@@ -159,18 +161,19 @@ void settings() {
         placement.load(savedX / 10000.0f, savedY / 10000.0f);
         legacyPlacement = false;
     }
-    // Deliberately ignore legacy Visible=1. Every launch starts in automatic mode.
+    // Ignore legacy Visible=1. AutoShow selects quest-driven or hotkey-only startup.
     settingsLoaded = true;
 }
 void saveSettings() {
     const auto& c=panel.config;
-    const std::array<ProfileSetting,16> values{{
+    const ProfileSettings values{{
         {L"PositionX",static_cast<int>(placement.x()*10000)},
         {L"PositionY",static_cast<int>(placement.y()*10000)},
         {L"ScalePercent",c.scale},{L"Opacity",c.opacity},{L"Width",c.width},{L"MaxRows",c.maxRows},
         {L"ShowDamage",c.damage},{L"ShowPercent",c.share},{L"ShowDps",c.dps},{L"ShowParticipation",c.time},
         {L"ShowComparison",c.comparison},{L"ShowKey",c.showKey},{L"HistoryKey",c.historyKey},
-        {L"SettingsKey",c.settingsKey},{L"MoveKey",c.moveKey},{L"ChatOpenKey",c.chatOpenKey}
+        {L"SettingsKey",c.settingsKey},{L"MoveKey",c.moveKey},{L"ChatOpenKey",c.chatOpenKey},
+        {L"ShowBadge",c.showBadge},{L"AutoShow",c.autoShow}
     }};
     saveProfileAsync(values);
 }
@@ -308,6 +311,12 @@ void drawOverlay(void* raw, UINT flags) {
     std::lock_guard<std::mutex> lock(renderMutex);
     if (!matches(raw) || resizing || disabled) return;
     poll();
+    static bool fullyHidden=false;
+    if(!visible&&!panel.config.showBadge){
+        if(!fullyHidden)setInputHotspot(RECT{});
+        fullyHidden=true;return;
+    }
+    fullyHidden=false;
 #ifdef METER_DIAGNOSTIC
     if(!diagnosticFocused)return;
 #else
@@ -367,6 +376,13 @@ unsigned diagnosticCacheBuilds(){return cacheBuilds;}
 unsigned diagnosticDx11Composites(){return dx11.compositeCount();}
 unsigned diagnosticDx11Rasterizations(){return dx11.rasterCount();}
 void diagnosticFocus(bool focused){diagnosticFocused=focused;}
+void diagnosticHidden(bool hidden){
+    std::lock_guard<std::mutex> lock(renderMutex);
+    settings();panel.config.showBadge=false;panel.config.autoShow=false;
+    visibility.automatic(false);preview=false;setEditing(false);
+    if(hidden)visibility.hide();else if(!visibility.visible())visibility.toggle();
+    visible=visibility.visible();refreshRequested=true;
+}
 void diagnosticPanelPage(int page) {
     std::lock_guard<std::mutex> lock(renderMutex);
     const auto now=utcMilliseconds();

@@ -1,5 +1,22 @@
 # Validation status
 
+## 0.6.13 visibility candidate — 2026-11-17
+
+ShowBadge and AutoShow default to enabled for compatibility. Both are saved by
+the background settings writer. Fully hidden panels have an empty input hotspot
+and skip GPU initialization/composition; the normal poll still records hunts.
+Manual visibility survives quest transitions when automatic opening is disabled.
+
+All 51 local tests passed, including the new visibility fixtures, persistence
+checks, quest transitions and the preceding archive tests. Localization auditing
+passed for 110 English source strings and twelve complete translation columns.
+
+New DX11/DX12 fixtures check hidden startup, real pixels absent while hidden,
+recovery through synthetic visibility toggles and resize while hidden. DX11 also
+checks that the compositor count does not advance during hidden frames. These
+are diagnostic hosts, not proof that a physical F8 press works in every game
+configuration. Real-game validation remains pending.
+
 ## 0.6.12 cumulative archive candidate — 2026-11-17
 
 The cumulative archive is separate from the ten-record history and introduces no

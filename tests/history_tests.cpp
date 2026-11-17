@@ -55,7 +55,7 @@ int main(){
     }
     {
         Panel panel;Meter m;auto view=panel.build(m,0);CHECK(view.rowCount==0);
-        panel.change(Action::Settings);view=panel.build(m,0);CHECK(view.settings && view.rowCount==14);
+        panel.change(Action::Settings);view=panel.build(m,0);CHECK(view.settings && view.rowCount==16);
         const int old=panel.config.scale;CHECK(panel.change(Action::Increase,0));CHECK(panel.config.scale==old+5);
         panel.change(Action::Increase,5);CHECK(!panel.config.dps);
         for(int i=0;i<100;++i)panel.change(Action::Increase,0);CHECK(panel.config.scale==175);

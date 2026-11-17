@@ -70,6 +70,14 @@ int main() {
     }
     const auto record=captureHunt(model,2000,1794435452000ULL);
     Panel panel;panel.history.add(record);
+    CHECK(panel.config.showBadge&&panel.config.autoShow);
+    panel.change(Action::Decrease,14);panel.change(Action::Decrease,15);
+    CHECK(!panel.config.showBadge&&!panel.config.autoShow);
+    panel.change(Action::Settings);const auto settingsView=panel.build(model,2000);
+    CHECK(settingsView.rowCount==16);
+    CHECK(settingsView.rows[14].name==tr(L"Show DM button")&&settingsView.rows[14].value==tr(L"No"));
+    CHECK(settingsView.rows[15].name==tr(L"Show on quest start")&&settingsView.rows[15].value==tr(L"No"));
+    panel.change(Action::Current);
     auto view=panel.build(model,2000);
     CHECK(view.title.find(questName(502))!=std::wstring::npos);
     panel.change(Action::History);view=panel.build(model,2000);

@@ -6,9 +6,9 @@ namespace=runpy.run_path(str(root/'scripts/generate-translations.py'))
 keys=set(namespace['strings'])
 technical={'F','Ctrl+','DM','DPS','Enter','Insert','.tmp','Segoe UI','Overlay','Corner',
  'ScalePercent','Opacity','Width','MaxRows','ShowDamage','ShowPercent','ShowDps',
- 'ShowParticipation','ShowComparison','ShowKey','HistoryKey','SettingsKey','MoveKey',
+ 'ShowParticipation','ShowComparison','ShowKey','HistoryKey','SettingsKey','MoveKey','ShowBadge','AutoShow','ArchiveHunts',
  'ChatOpenKey','PositionX','PositionY','iceborne_damage_meter.ini',
- 'iceborne_damage_meter_history.dat','iceborne_damage_meter_last_hunt.txt','wt, ccs=UTF-8'}
+ 'iceborne_damage_meter_history.dat','iceborne_damage_meter_last_hunt.txt','iceborne_damage_meter_hunts.bin','wt, ccs=UTF-8'}
 formats=namespace['tokens']
 for name in ['panel.hpp','panel_overlay.inl','overlay.cpp','history_store.cpp','share_chat.hpp','quests.hpp','weapons.hpp']:
  text=(root/'src'/name).read_text(encoding='utf-8-sig')

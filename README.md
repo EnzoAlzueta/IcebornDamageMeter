@@ -11,7 +11,9 @@ are unchanged. This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Development candidate: 0.6.12.** Adds an optional cumulative binary hunt archive
+**Development candidate: 0.6.13.** Includes saved settings to hide the DM shortcut
+and use manual panel visibility. With the panel and shortcut hidden, GPU drawing
+is skipped; recording continues. It also includes an optional cumulative binary hunt archive
 for a future external analyzer. The UI still keeps ten hunts. Storage is handled
 in the background with bounded memory and startup reads; no historical analysis
 runs in-game. See [archive format and operation](docs/HUNT-ARCHIVE.md). This

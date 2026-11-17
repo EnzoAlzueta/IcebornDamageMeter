@@ -8,6 +8,7 @@ namespace meter {
 struct PanelConfig {
     int scale=100,opacity=92,width=460,maxRows=4;
     bool damage=true,share=true,dps=true,time=true,comparison=true;
+    bool showBadge=true,autoShow=true;
     int showKey=0x77,historyKey=0x76,settingsKey=0x75,moveKey=0x78,chatOpenKey=0x2d;
     void normalize() {
         scale=std::clamp(scale,40,175); opacity=std::clamp(opacity,55,100);
@@ -129,6 +130,8 @@ public:
             case 11:changeKey(config.settingsKey,d);break;
             case 12:changeKey(config.moveKey,d);break;
             case 13:config.chatOpenKey=config.chatOpenKey==0x2d?0x0d:0x2d;break;
+            case 14:config.showBadge=!config.showBadge;break;
+            case 15:config.autoShow=!config.autoShow;break;
             }
             config.normalize(); return true;
         }
@@ -159,9 +162,9 @@ public:
         } else if(page==PanelPage::Settings) {
             view.settings=true;view.rowHeight=view.narrow?44.0f:25.0f;view.bodyTop=42;view.title=tr(L"LOG · SETTINGS");
             const wchar_t* labels[]={tr(L"Scale"),tr(L"Opacity"),tr(L"Width"),tr(L"Total damage"),tr(L"Percentage"),tr(L"Observed DPS"),
-                tr(L"Participation time"),tr(L"Personal comparison"),tr(L"Visible rows"),tr(L"Show / hide"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Game chat key")};
+                tr(L"Participation time"),tr(L"Personal comparison"),tr(L"Visible rows"),tr(L"Show / hide"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Game chat key"),tr(L"Show DM button"),tr(L"Show on quest start")};
             const bool flags[]={config.damage,config.share,config.dps,config.time,config.comparison};
-            for(int i=0;i<14;++i) {
+            for(int i=0;i<16;++i) {
                 auto& row=view.rows[view.rowCount++];row.name=labels[i];row.colored=false;
                 if(i==0)row.value=std::to_wstring(config.scale)+L"%";
                 if(i==1)row.value=std::to_wstring(config.opacity)+L"%";
@@ -173,6 +176,8 @@ public:
                 if(i==11)row.value=keyName(config.settingsKey);
                 if(i==12)row.value=L"Ctrl+"+keyName(config.moveKey);
                 if(i==13)row.value=config.chatOpenKey==0x2d?L"Insert":L"Enter";
+                if(i==14)row.value=config.showBadge?tr(L"Yes"):tr(L"No");
+                if(i==15)row.value=config.autoShow?tr(L"Yes"):tr(L"No");
                 const float y=view.bodyTop+i*view.rowHeight+(view.narrow?20.0f:0.0f);
                 view.button({width-66,y+1,24,22},L"−",Action::Decrease,i);
                 view.button({width-36,y+1,24,22},L"+",Action::Increase,i);
