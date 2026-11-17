@@ -17,7 +17,13 @@ damage and weapon changes are excluded. Different quests sharing a monster are
 not equated. Multi-target damage is mission-wide. These are descriptive metrics,
 not a normalized player skill score.
 
-The history is capped at ten records; player storage is bounded. Text and panel
+The visible history is capped at ten records; player storage is bounded. The
+optional cumulative binary archive introduced in 0.6.12 is independent: it
+appends only final hunt summaries on the storage worker, uses a fixed producer
+queue and reads only a bounded tail at startup. It is not loaded for rendering or
+analyzed in-game. See [the format and limits](HUNT-ARCHIVE.md).
+
+Text and panel
 commands are reused between changes. Hidden panels do not rebuild their rows.
 Persistence runs on a sleeping worker, including settings updates. No network or
 file operations are added to the per-frame drawing routine.

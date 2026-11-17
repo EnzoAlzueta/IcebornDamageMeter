@@ -55,6 +55,20 @@ Existing INI key bindings are preserved. Settings include scale 40–175%, width
 Observed DPS includes time present, including travel and pauses; it is not active
 attack time or a normalized skill score. Multi-target quests show mission totals.
 
+## Long-term hunt archive
+
+`ArchiveHunts=1` under `[Overlay]` enables
+`nativePC/plugins/iceborne_damage_meter_hunts.bin`. It appends hunt summaries in
+the background for a future external analyzer; the meter still displays ten
+recent hunts and does not analyze or load the full archive. Existing recent
+records newer than the latest common archive entry are imported on startup;
+if no common entry exists, the available recent snapshot is imported.
+
+Set `ArchiveHunts=0` with the game closed to disable archiving. Preserve the
+archive when updating. To remove it, close the game and delete only that file;
+the ten-entry history is separate. Disk/file errors leave the recent history
+active and are reported in the plugin log. A sudden exit can lose queued data.
+
 ## Language
 
 `Language=auto` under `[Overlay]` in the INI follows the game's Steam language.

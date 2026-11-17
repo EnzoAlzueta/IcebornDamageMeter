@@ -57,6 +57,21 @@ El DPS incluye el tiempo presente, con viajes y pausas; no mide tiempo de ataque
 activo ni una puntuación de habilidad. En misiones con varios objetivos, el daño
 corresponde a la misión completa.
 
+## Archivo de cacerías a largo plazo
+
+`ArchiveHunts=1` bajo `[Overlay]` activa el archivo
+`nativePC/plugins/iceborne_damage_meter_hunts.bin`. Agrega resúmenes en segundo
+plano para un futuro analizador externo; el medidor sigue mostrando diez
+cacerías y no carga ni analiza el archivo completo. Al iniciar importa los
+registros posteriores a la última entrada común con el archivo; si no hay
+coincidencias, importa los registros recientes disponibles.
+
+Con el juego cerrado, poné `ArchiveHunts=0` para desactivar el guardado acumulativo.
+Conservá el archivo al actualizar. Para quitarlo, cerrá el juego y borrá solamente
+ese archivo; el historial de diez es independiente. Los errores se registran
+en el log y no desactivan el historial reciente. Una salida repentina puede perder
+datos que todavía estén en la cola.
+
 ## Idioma
 
 `Language=auto` bajo `[Overlay]` en el INI usa el idioma del juego configurado

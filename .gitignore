@@ -12,6 +12,7 @@
 *.bak
 *.tmp
 iceborne_damage_meter_history.dat
+iceborne_damage_meter_hunts.bin
 iceborne_damage_meter_last_hunt.txt
 iceborne_damage_meter_install.json
 /CONTINUAR-AQUI.md

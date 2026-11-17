@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.12 (candidate)
+
+- Add an optional cumulative binary hunt archive for future external analysis;
+  keep the existing ten-hunt history, UI, sampling and statistics unchanged.
+- Append versioned, checksummed hunt summaries on the storage worker through a
+  fixed queue. Never scan the full archive or compute aggregates in-game.
+- Check only the bounded file tail at startup, import missing recent records,
+  recover recognized interrupted trailing writes and preserve corrupt files.
+- Archive errors are isolated from recent-history and settings persistence.
+  Set ArchiveHunts=0 under Overlay and restart to opt out.
+- Document the binary format and add storage/recovery tests and a separate
+  synthetic archive-size benchmark. Real-game performance validation is pending.
+
 ## 0.6.11 package revision 2
 
 - Remove development, validation, release-planning and localization-maintenance

@@ -20,4 +20,8 @@ Logs: nativePC/plugins/iceborne_damage_meter.log and the bootstrap log beside EX
 With Seamless, also inspect nativePC/plugins/mhw-mod-loader.log.
 No installer is required. Source and runtime packages are different artifacts.
 
+ArchiveHunts=1 under [Overlay] saves cumulative binary hunt summaries in the
+background; the visible history still keeps ten hunts. Set 0 and restart to opt out.
+Keep nativePC/plugins/iceborne_damage_meter_hunts.bin when updating.
+
 Downloads and reports: https://www.nexusmods.com/monsterhunterworld/mods/8969

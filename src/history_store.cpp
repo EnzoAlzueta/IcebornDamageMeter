@@ -1,5 +1,6 @@
 #include "runtime.hpp"
 #include "history.hpp"
+#include "hunt_archive.hpp"
 #include "quests.hpp"
 #include <fstream>
 #include <filesystem>
@@ -10,12 +11,19 @@ std::mutex storeMutex;
 HANDLE storeEvent=nullptr;
 History loadedHistory, pendingHistory;
 HuntRecord pendingLast;
+constexpr size_t ArchiveQueueCapacity=32;
+std::array<HuntRecord,ArchiveQueueCapacity> archiveQueue;
+size_t archiveHead=0,archiveCount=0;
+unsigned archiveDropped=0;
+std::atomic<bool> archiveEnabled{true};
 bool loaded=false,pending=false;
 bool profilePending=false;
 std::array<ProfileSetting,16> pendingProfile{};
 std::wstring storeFolder;
 std::atomic<unsigned> completedWrites{0};
 std::atomic<unsigned> completedProfiles{0};
+std::atomic<unsigned> completedArchives{0};
+std::atomic<bool> storageIdle{false};
 DWORD WINAPI historyWorker(void*) {
   try {
     History history;
@@ -26,15 +34,49 @@ DWORD WINAPI historyWorker(void*) {
         std::ifstream in(std::filesystem::path(path),std::ios::binary);
         if(!history_codec::load(in,history)) log("History invalid or incompatible; starting empty.");
     }
-    { std::lock_guard<std::mutex> lock(storeMutex); loadedHistory=std::move(history); loaded=true; }
+    HuntArchive archive;
+    const auto configurationPath=storeFolder+L"iceborne_damage_meter.ini";
+    bool archiveReady=GetPrivateProfileIntW(L"Overlay",L"ArchiveHunts",1,configurationPath.c_str())!=0;
+    if(archiveReady){
+        try {
+            archiveReady=archive.open(std::filesystem::path(storeFolder+L"iceborne_damage_meter_hunts.bin"));
+            if(archiveReady){
+                // Import only the existing ten recent records, never the full archive.
+                unsigned imported=0;
+                archiveReady=archive.importRecent(history,imported);
+                completedArchives.fetch_add(imported);
+                if(archive.recoveredBytes())log("Hunt archive recovered an interrupted tail (%llu bytes).",archive.recoveredBytes());
+            }
+            if(!archiveReady)log("Hunt archive disabled for this session: %s. Recent history remains active.",archive.error());
+        } catch(...) {archiveReady=false;archive.close();log("Hunt archive initialization failed; recent history remains active.");}
+    }
+    archiveEnabled.store(archiveReady);
+    { std::lock_guard<std::mutex> lock(storeMutex); loadedHistory=std::move(history); loaded=true;
+      if(!pending&&!profilePending&&!archiveCount)storageIdle.store(true); }
     for(;;) {
         if(WaitForSingleObject(storeEvent,INFINITE)!=WAIT_OBJECT_0) return 0;
+        for(;;){
         History toSave; HuntRecord last;std::array<ProfileSetting,16> profile{};
+        HuntRecord toArchive;bool writeArchive=false;unsigned dropped=0;
         bool writeHistory=false,writeProfile=false;
-        { std::lock_guard<std::mutex> lock(storeMutex); if(!pending&&!profilePending) continue;
+        { std::lock_guard<std::mutex> lock(storeMutex); if(!pending&&!profilePending&&!archiveCount&&!archiveDropped){storageIdle.store(true);break;}
+          storageIdle.store(false);
           writeHistory=pending;writeProfile=profilePending;
           if(pending){toSave=pendingHistory;last=pendingLast;pending=false;}
-          if(profilePending){profile=pendingProfile;profilePending=false;} }
+          if(profilePending){profile=pendingProfile;profilePending=false;}
+          if(archiveCount){toArchive=std::move(archiveQueue[archiveHead]);archiveHead=(archiveHead+1)%ArchiveQueueCapacity;--archiveCount;writeArchive=true;}
+          dropped=archiveDropped;archiveDropped=0; }
+        if(dropped)log("Hunt archive queue full: %u records could not be queued. Recent history remains active.",dropped);
+        if(writeArchive&&archiveReady){
+            try {
+                const auto result=archive.append(toArchive);
+                if(result==HuntArchive::Result::Appended)++completedArchives;
+                if(result==HuntArchive::Result::Failed){
+                    archiveReady=false;archiveEnabled.store(false);
+                    log("Hunt archive disabled for this session: %s. Recent history remains active.",archive.error());
+                }
+            } catch(...) {archiveReady=false;archiveEnabled.store(false);archive.close();log("Hunt archive write failed; recent history remains active.");}
+        }
         if(writeHistory) {
         const auto temporary=path+L".tmp";
         bool ok=false;
@@ -63,6 +105,7 @@ DWORD WINAPI historyWorker(void*) {
             }
             if(ok)++completedProfiles;else log("Could not save overlay settings.");
         }
+        }
     }
   } catch(...) {log("History storage exception; in-memory history remains available.");return 0;}
 }
@@ -81,16 +124,22 @@ bool takeLoadedHistory(History& history) {
 }
 void saveHistoryAsync(const History& history,const HuntRecord& last) {
     if(!storeEvent) return;
-    { std::lock_guard<std::mutex> lock(storeMutex); pendingHistory=history; pendingLast=last; pending=true; }
+    { std::lock_guard<std::mutex> lock(storeMutex); storageIdle.store(false);pendingHistory=history; pendingLast=last; pending=true;
+      if(archiveEnabled.load()){
+          if(archiveCount<ArchiveQueueCapacity){archiveQueue[(archiveHead+archiveCount)%ArchiveQueueCapacity]=last;++archiveCount;}
+          else ++archiveDropped;
+      } }
     SetEvent(storeEvent);
 }
 void saveProfileAsync(const std::array<ProfileSetting,16>& values) {
     if(!storeEvent)return;
-    {std::lock_guard<std::mutex> lock(storeMutex);pendingProfile=values;profilePending=true;}
+    {std::lock_guard<std::mutex> lock(storeMutex);storageIdle.store(false);pendingProfile=values;profilePending=true;}
     SetEvent(storeEvent);
 }
 #ifdef METER_DIAGNOSTIC
 unsigned diagnosticHistoryWrites(){return completedWrites.load();}
 unsigned diagnosticProfileWrites(){return completedProfiles.load();}
+unsigned diagnosticArchiveWrites(){return completedArchives.load();}
+bool diagnosticStorageIdle(){return storageIdle.load();}
 #endif
 }

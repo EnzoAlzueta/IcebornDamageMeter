@@ -1,5 +1,31 @@
 # Validation status
 
+## 0.6.12 cumulative archive candidate — 2026-11-17
+
+The cumulative archive is separate from the ten-record history and introduces no
+per-frame archive operations or statistical analysis. It uses a fixed 32-record
+producer queue and a storage-worker-owned file. Startup reads at most 28,547 bytes
+including the header, and retains at most ten encoded records for deduplication.
+
+All 49 local tests passed, including DX11/DX12 rendering regressions and Unicode record roundtrips,
+bounded reopen, interrupted first/last-frame recovery, corruption preservation,
+multi-hunt queue retention, opt-out and archive-error isolation. Startup import
+also covers the archive being ahead of or behind the recent-history snapshot,
+without cascading duplicate imports. Package checks accompany the prepared candidate.
+
+Synthetic local benchmark: 1,000/10,000/100,000 hunts, four sample players,
+Windows filesystem cache warm, 32 individually flushed measured appends per size.
+Batch writes populate each fixture before timing. The median worker append took
+approximately 1.65–1.79 ms, with observed p95 1.96–2.05 ms. Reopen took 8.05–11.67 ms;
+all three read exactly 28,547 bytes and retained ten records. The standalone
+benchmark process private bytes were 602,112 / 630,784 / 630,784; these are not
+measurements of the full game or the entire meter's memory footprint.
+
+Raw results: build/validation-0612/archive-benchmark-final.txt. This does not establish
+zero FPS cost, absence of game-frame spikes, Intel laptop performance or safety
+under every storage failure. Real-game playtesting remains pending. Archive
+format, recovery limits and process-exit caveats are in [HUNT-ARCHIVE.md](HUNT-ARCHIVE.md).
+
 ## 0.6.11 field report — 2026-11-15
 
 The user reports successful testing with their friend: everything works and no
