@@ -3,6 +3,8 @@
 A compact, in-process damage meter for **Monster Hunter World: Iceborne** on
 Windows x64. No separate overlay application or translation service is required.
 
+![Iceborn Damage Meter compact panel showing damage, team share and DPS for four hunters with sample data](assets/readme/damage-meter-preview.png)
+
 **GitHub beta: 0.6.14.** Download the full installation or the existing-users
 update from the [release page](https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.14).
 The mod is also available on [Nexus Mods](https://www.nexusmods.com/monsterhunterworld/mods/8969).
