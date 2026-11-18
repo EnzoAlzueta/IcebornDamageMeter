@@ -12,11 +12,11 @@ This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Development candidate: 0.6.15.** Keeps the compact meter one line per hunter
+**Development candidate: 0.6.16.** Keeps the compact meter one line per hunter
 down to width 260. Uses official localized quest names/objectives, including
 Simplified Chinese and a distinct Latin American Spanish game-text variant.
 Generic investigations retain their translated label without a guessed target.
-This candidate is separate from the published 0.6.14 beta.
+It also improves history persistence and keeps sampling when rendering stops.
 
 **Changes since 0.6.11-r2:** removes in-game chat sending; the manual
 clipboard action remains available. Includes saved settings to hide the DM shortcut
@@ -54,8 +54,9 @@ Close the game and open its local files from Steam.
 | No loader | Normal ZIP: nativePC + xinput9_1_0.dll |
 | Stracker | Normal ZIP: only nativePC |
 
-Never replace another mod's root or chain DLL. On update, preserve your INI and
-hunt history. See [the installation guide](packaging/INSTALL.md)
+Use the same standard ZIP to install or update. If the meter already works,
+replace only `nativePC/plugins/iceborne_damage_meter.dll` from the ZIP and keep
+your loader, INI and saved hunts. See [the installation guide](packaging/INSTALL.md)
 for complete language settings, updates, removal and troubleshooting.
 
 ## Default controls

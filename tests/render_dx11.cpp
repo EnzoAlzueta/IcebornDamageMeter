@@ -23,6 +23,8 @@ void diagnosticPanelSize(int,int);
 void diagnosticRecapture(void*,IUnknown*);
 void diagnosticQuest(int,bool);
 bool diagnosticCompactValuesFit();
+void diagnosticQueueSample(Sample);
+std::uint64_t diagnosticTrackedDamage();
 }
 static void require(HRESULT result,const char* operation) {
     if(FAILED(result)){std::printf("%s: 0x%08lx\n",operation,static_cast<unsigned long>(result));throw std::runtime_error(operation);}
@@ -64,6 +66,8 @@ int main(int argc,char** argv) {
     const bool tinyScale=mode=="small";
     const bool focusTest=mode=="focus";
     const bool hiddenTest=mode=="hidden";
+    const bool settledTest=mode=="settled-cache";
+    const bool presentErrorTest=mode=="present-errors";
     const bool localeJapanese=mode=="locale-ja",localeArabic=mode=="locale-ar";
     const bool bgra=mode.find("bgra")!=std::string::npos;
     const bool copied=mode.find("copied")!=std::string::npos;
@@ -107,7 +111,7 @@ int main(int argc,char** argv) {
         if(localeJapanese||localeArabic)meter::setLanguage(localeJapanese?meter::Language::Japanese:meter::Language::Arabic);
         meter::diagnosticPreview(false,false);if(settings||history||localeJapanese||localeArabic)meter::diagnosticPanelPage(history?2:1);
         if(chinese)meter::setLanguage(meter::Language::ChineseSimplified);
-        if(chinese||maximumCounters)meter::diagnosticQuest(1591,maximumCounters);
+        if(chinese||maximumCounters||settledTest)meter::diagnosticQuest(1591,maximumCounters);
         D3D11_SAMPLER_DESC s{};s.Filter=D3D11_FILTER_MIN_MAG_MIP_LINEAR;s.AddressU=s.AddressV=s.AddressW=D3D11_TEXTURE_ADDRESS_WRAP;s.MaxLOD=D3D11_FLOAT32_MAX;
         ComPtr<ID3D11SamplerState> sentinel;require(device->CreateSamplerState(&s,&sentinel),"Sentinel sampler");
         D3D11_BUFFER_DESC bd{};bd.ByteWidth=64;bd.Usage=D3D11_USAGE_DEFAULT;bd.BindFlags=D3D11_BIND_CONSTANT_BUFFER;
@@ -129,6 +133,7 @@ int main(int argc,char** argv) {
             ID3D11SamplerState* sampler=sentinel.Get();context->PSSetSamplers(5,1,&sampler);
             ID3D11Buffer* cb=constant.Get();context->VSSetConstantBuffers(2,1,&cb);context->CSSetConstantBuffers(3,1,&cb);
             context->SetPredication(nullptr,FALSE);
+            if (settledTest) meter::diagnosticQueueSample(meter::Sample{});
             if(flip&&(frame&1)) {
                 ComPtr<IDXGISwapChain1> modern;require(chain.As(&modern),"Present1 interface");
                 const DXGI_PRESENT_PARAMETERS parameters{};require(modern->Present1(0,0,&parameters),"Present1");
@@ -158,6 +163,24 @@ int main(int argc,char** argv) {
         if(meter::diagnosticDx11Rasterizations()<3||meter::diagnosticDx11Rasterizations()>=meter::diagnosticDx11Composites())
             throw std::runtime_error("DX11 static raster was not reused across frames/resizes");
         std::printf("DX11 rasterizations: %u; composites: %u (includes two resizes).\n",meter::diagnosticDx11Rasterizations(),meter::diagnosticDx11Composites());
+        if (presentErrorTest) {
+            meter::observePresentResult(chain.Get(), DXGI_ERROR_WAS_STILL_DRAWING);
+            if (!meter::diagnosticReady()) throw std::runtime_error("A busy Present disabled drawing");
+            meter::observePresentResult(chain.Get(), DXGI_ERROR_INVALID_CALL);
+            if (!meter::diagnosticReady()) throw std::runtime_error("Present failure on a live device disabled drawing");
+            meter::observePresentResult(chain.Get(), DXGI_ERROR_DEVICE_REMOVED);
+            if (meter::diagnosticReady()) throw std::runtime_error("Device removal left drawing enabled");
+            const auto composites = meter::diagnosticDx11Composites();
+            meter::Sample sample;
+            sample.valid = sample.countersValid = true;
+            sample.state = 2;
+            sample.questId = 1591;
+            sample.players[0] = {1, L"Hunter", 350, true, true, 0};
+            meter::diagnosticQueueSample(sample);
+            meter::drawOverlay(chain.Get(), 0);
+            if (meter::diagnosticTrackedDamage() != 350 || meter::diagnosticDx11Composites() != composites)
+                throw std::runtime_error("Disabled drawing stopped sampling or still composited pixels");
+        }
         meter::shutdownOverlay();meter::removeHooks();
         external.restore();
         if((externalBefore||externalAfter)&&!overlay_fixture::calls)throw std::runtime_error("External overlay bypassed");

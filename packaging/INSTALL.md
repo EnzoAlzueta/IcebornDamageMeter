@@ -28,20 +28,15 @@ not an extra application. The source ZIP is for developers.
 
 ## Update or remove
 
-Close the game. Keep your existing `iceborne_damage_meter.ini` and
-`iceborne_damage_meter_history.dat` and `iceborne_damage_meter_hunts.bin` under
-`nativePC/plugins`; do not replace
-them with defaults from a new package. Replace only our plugin and, when a
-release requires it, our matching bootstrap. Keep other mods' loaders intact.
+Use the standard ZIP for both first-time installations and updates. If the meter
+already works, close the game. Copy only `nativePC/plugins/iceborne_damage_meter.dll`
+from the ZIP to the same path in the game folder, replacing the existing plugin.
+Keep your current loader, `iceborne_damage_meter.ini`, recent history
+(`iceborne_damage_meter_history.dat`), and archive (`iceborne_damage_meter_hunts.bin`).
 
 To remove the meter, delete only `nativePC/plugins/iceborne_damage_meter.dll`.
 Keep settings/history if wanted. Remove our bootstrap only after verifying it
 belongs to this package and is not needed by your setup. Never delete `nativePC`.
-
-For an existing working installation, use the **update-plugin-only ZIP** with
-the game closed. It replaces only our plugin and contains no default INI or
-bootstrap. Version 0.6.14 does not require replacing a working 0.6.11 meter
-bootstrap. For a new installation, use the full package as described above.
 
 ## Controls and layout
 

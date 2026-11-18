@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.16 — development candidate
+
+- Preserve the previous hunt as partial if sampling jumps directly to a new quest.
+- Merge early saves with existing recent history before writing to disk.
+- Keep drawing across temporary DXGI presentation failures. Continue recording
+  damage while presentation callbacks arrive with the renderer disabled.
+- Reuse settled hunt layouts between samples until display content changes.
+- Document first-time installation and plugin-only updates in the standard ZIP.
+
 ## 0.6.15 — development candidate
 
 - Keep the compact damage meter on one line per hunter below width 360, down to

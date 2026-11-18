@@ -14,11 +14,25 @@ struct HuntRecord {
     const Player* local() const { for (const auto& p:players) if(p.id && p.local) return &p; return nullptr; }
     bool success() const { return outcome == 3 || outcome == 4; }
 };
-inline HuntRecord captureHunt(const Meter& model, std::uint64_t now, std::uint64_t timestamp) {
+inline HuntRecord captureHunt(const Meter& model, std::uint64_t now, std::uint64_t timestamp, bool interrupted=false) {
     HuntRecord r;
     r.timestamp=timestamp; r.durationMs=model.durationMs(now); r.questId=model.questId();
     r.outcome=model.outcome(); r.partySize=model.peakParty(); r.partial=model.partial(); r.players=model.ranked();
+    if (interrupted) {
+        r.partial = true;
+        r.outcome = 6;
+    }
     return r;
+}
+template<class Archive>
+void updateHunt(Meter& model, const Sample& sample, std::uint64_t now, Archive archive) {
+    const auto before = model.phase();
+    const bool enteringExpedition = sample.valid && sample.expedition && !model.expedition();
+    if (enteringExpedition || model.startsNewHunt(sample)) {
+        if (before == Phase::Live || before == Phase::Settling) archive(before == Phase::Live);
+    }
+    model.update(sample, now);
+    if (before != Phase::Summary && model.phase() == Phase::Summary) archive(false);
 }
 class History {
     std::vector<HuntRecord> records_;
@@ -27,6 +41,9 @@ public:
     void add(HuntRecord r) {
         if (records_.size()==10) records_.pop_back();
         records_.insert(records_.begin(), std::move(r));
+    }
+    void addNewer(const History& newer) {
+        for (auto it = newer.records_.rbegin(); it != newer.records_.rend(); ++it) add(*it);
     }
     size_t size() const { return records_.size(); }
     const HuntRecord* get(size_t i) const { return i<records_.size()?&records_[i]:nullptr; }

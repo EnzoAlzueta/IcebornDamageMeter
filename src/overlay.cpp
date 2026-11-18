@@ -54,6 +54,7 @@ bool legacyPlacement = true;
 bool diagnosticAllWeapons = false;
 bool diagnosticZeroDamage = false;
 bool diagnosticFocused = true;
+std::optional<Sample> diagnosticPendingSample;
 #endif
 float scale = 1;
 ULONGLONG lastPoll = 0;
@@ -189,10 +190,16 @@ void saveSettings() {
     saveProfileAsync(values);
 }
 #include "panel_overlay.inl"
+void disableRendering() {
+    disabled = true;
+    pendingAction.reset();
+    setEditing(false);
+    setInputHotspot(RECT{});
+}
 bool checked(HRESULT result, const char* operation) {
     if (SUCCEEDED(result)) return true;
     log("%s failed: 0x%08lx. Overlay disabled until restart.", operation, static_cast<unsigned long>(result));
-    disabled = true;
+    disableRendering();
     return false;
 }
 bool waitGpu() {
@@ -206,7 +213,7 @@ bool waitGpu() {
 void releaseTargets() {
     if (context2d) context2d->SetTarget(nullptr);
     if (context11) { context11->ClearState(); context11->Flush(); }
-    if (!waitGpu()) { log("GPU wait failed during resize; disabling overlay."); disabled = true; }
+    if (!waitGpu()) { log("GPU wait failed during resize; disabling overlay."); disableRendering(); }
     for (auto& t : targets) t.Reset();
     for (auto& w : wrapped) w.Reset();
     if(gameDevice11)dx11.releaseTarget();
@@ -217,11 +224,11 @@ void releaseTargets() {
 bool createTargets() {
     DXGI_SWAP_CHAIN_DESC desc{};
     if (!checked(swapchain->GetDesc(&desc), "GetDesc")) return false;
-    if (desc.BufferCount > targets.size() || desc.BufferCount == 0) { disabled = true; log("Unsupported buffer count."); return false; }
+    if (desc.BufferCount > targets.size() || desc.BufferCount == 0) { log("Unsupported buffer count."); disableRendering(); return false; }
     if (desc.BufferDesc.Format != DXGI_FORMAT_R8G8B8A8_UNORM && desc.BufferDesc.Format != DXGI_FORMAT_B8G8R8A8_UNORM &&
         !(gameDevice11&&(desc.BufferDesc.Format==DXGI_FORMAT_R8G8B8A8_UNORM_SRGB||desc.BufferDesc.Format==DXGI_FORMAT_B8G8R8A8_UNORM_SRGB))) {
         log("Unsupported render format %u. MVP supports SDR 8-bit.", desc.BufferDesc.Format);
-        disabled = true; return false;
+        disableRendering(); return false;
     }
     window = desc.OutputWindow;
     if(gameDevice11) {
@@ -283,7 +290,7 @@ bool initializeGraphics() {
     if(device12) {
     if (!checked(device12->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)), "CreateFence")) return false;
     fenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    if (!fenceEvent) { disabled = true; log("CreateEvent failed."); return false; }
+    if (!fenceEvent) { log("CreateEvent failed."); disableRendering(); return false; }
     }
     log("Internal D2D/%s renderer ready.",gameDevice11?"DX11":"DX12");
     return createTargets();
@@ -320,7 +327,13 @@ bool attachSwapchain(void* raw, IUnknown* rawQueue) {
 void drawOverlay(void* raw, UINT flags) {
     if (flags & DXGI_PRESENT_TEST) return;
     std::lock_guard<std::mutex> lock(renderMutex);
-    if (!matches(raw) || resizing || disabled) return;
+    if (!matches(raw)) return;
+    if (disabled) {
+        updateGameLanguage();
+        pollHunt(GetTickCount64());
+        return;
+    }
+    if (resizing) return;
     poll();
     static bool fullyHidden=false;
     if(!visible&&!panel.config.showBadge){
@@ -344,14 +357,21 @@ void beforeResize(void* raw) {
     releaseTargets();
 }
 void observePresentResult(void* raw,HRESULT result) {
+    if (SUCCEEDED(result) || result == DXGI_ERROR_WAS_STILL_DRAWING) return;
     std::lock_guard<std::mutex> lock(renderMutex);
-    static bool reported=false;
-    if(!matches(raw)||!FAILED(result)||reported)return;
-    reported=true;
+    if (disabled || !matches(raw)) return;
     const auto reason=gameDevice11?gameDevice11->GetDeviceRemovedReason():device12?device12->GetDeviceRemovedReason():S_OK;
-    log("Game Present failed: hr=0x%08lx deviceReason=0x%08lx api=%s; disabling meter rendering. Not proof of root cause.",
+    const bool deviceLost = FAILED(reason) || result == DXGI_ERROR_DEVICE_REMOVED ||
+        result == DXGI_ERROR_DEVICE_RESET || result == DXGI_ERROR_DEVICE_HUNG || result == DXGI_ERROR_DRIVER_INTERNAL_ERROR;
+    if (!deviceLost) {
+        static bool reported = false;
+        if (!reported) log("Game Present failed: hr=0x%08lx; rendering will retry.", static_cast<unsigned long>(result));
+        reported = true;
+        return;
+    }
+    log("Game Present reported device loss: hr=0x%08lx deviceReason=0x%08lx api=%s; disabling meter rendering.",
         static_cast<unsigned long>(result),static_cast<unsigned long>(reason),gameDevice11?"DX11":"DX12");
-    disabled=true;
+    disableRendering();
 }
 void afterResize(void* raw) {
     std::lock_guard<std::mutex> lock(renderMutex);
@@ -384,6 +404,15 @@ bool diagnosticReady() {
     return ready && !disabled && bufferCount != 0;
 }
 unsigned diagnosticCacheBuilds(){return cacheBuilds;}
+void diagnosticQueueSample(Sample sample) {
+    std::lock_guard<std::mutex> lock(renderMutex);
+    diagnosticPendingSample = std::move(sample);
+    lastPoll = 0;
+}
+std::uint64_t diagnosticTrackedDamage() {
+    std::lock_guard<std::mutex> lock(renderMutex);
+    return model.total();
+}
 void diagnosticQuest(int id,bool maximumCounters) {
     std::lock_guard<std::mutex> lock(renderMutex);
     settings();model=Meter{};

@@ -8,7 +8,8 @@ Copying nativePC alone may not load this plugin through Seamless.
 
 Use DX11 or DX12 with SDR; the API is detected automatically.
 F8 show/hide; Ctrl+F8 preview; F6 settings; Ctrl+F6 menu; F7 history; Ctrl+F9 move.
-Preserve your INI and history when updating. Remove only our plugin to uninstall.
+If the meter already works, replace only nativePC/plugins/iceborne_damage_meter.dll
+from the ZIP. Keep your loader, INI and saved hunts. Remove our plugin to uninstall.
 Never delete nativePC or another mod's loader.
 
 English guide: IceborneDamageMeter/INSTALL.md

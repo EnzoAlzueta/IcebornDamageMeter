@@ -39,11 +39,6 @@ Podés conservar ajustes e historial. Quitá nuestro cargador únicamente si
 confirmaste que pertenece al paquete y tu instalación no lo necesita.
 No borres toda la carpeta `nativePC`.
 
-Si el mod ya funciona, usá el ZIP **update-plugin-only** con el juego cerrado.
-Reemplaza solo nuestro plugin y no incluye INI ni cargador. La 0.6.14 no requiere
-reemplazar el bootstrap del medidor 0.6.11 que ya funciona. Para una instalación
-nueva, usá el paquete completo siguiendo las instrucciones de arriba.
-
 ## Controles y tamaño
 
 El panel aparece automáticamente durante una misión. Controles predeterminados:

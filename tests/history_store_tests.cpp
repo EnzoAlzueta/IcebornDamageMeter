@@ -5,7 +5,17 @@
 #include <cstdio>
 #include <cstring>
 namespace meter {
-void log(const char* text,...){std::printf("Storage: %s\n",text);}
+namespace {
+HANDLE startupPaused = nullptr;
+HANDLE resumeStartup = nullptr;
+}
+void log(const char* text, ...) {
+    std::printf("Storage: %s\n", text);
+    if (startupPaused && std::strstr(text, "archive disabled for this session")) {
+        SetEvent(startupPaused);
+        WaitForSingleObject(resumeStartup, 5000);
+    }
+}
 unsigned diagnosticHistoryWrites();
 unsigned diagnosticProfileWrites();
 unsigned diagnosticArchiveWrites();
@@ -14,17 +24,44 @@ bool diagnosticStorageIdle();
 int main(int argc,char** argv){
     using namespace meter;
     const bool disabled=argc>1&&std::string(argv[1])=="disabled",failure=argc>1&&std::string(argv[1])=="failure";
+    const bool earlySave = argc > 1 && std::string(argv[1]) == "early-save";
     const auto directory=std::filesystem::current_path()/(L"storage-test-"+std::to_wstring(GetCurrentProcessId())+L"-"+std::to_wstring(GetTickCount64()));
     std::filesystem::create_directories(directory);
     const auto archive=directory/L"iceborne_damage_meter_hunts.bin";
     if(disabled){std::ofstream out(directory/L"iceborne_damage_meter.ini");out<<"[Overlay]\nArchiveHunts=0\n";}
-    if(failure)std::filesystem::create_directory(archive);
+    if(failure || earlySave)std::filesystem::create_directory(archive);
     HuntRecord r;r.timestamp=1000;r.questId=42;r.outcome=3;r.partySize=1;r.durationMs=10000;
     r.players[0]={1,L"Jugador español",100,true,true,0};r.players[0].participationMs=10000;
     History history;history.add(r);
     const auto path=directory/L"iceborne_damage_meter_history.dat";
     {std::ofstream out(path,std::ios::binary);if(!history_codec::save(out,history))return 1;}
+    if (earlySave) {
+        startupPaused = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        resumeStartup = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        if (!startupPaused || !resumeStartup) return 18;
+    }
     startHistoryStore(directory.wstring()+L"\\");
+    if (earlySave) {
+        // Pause archive initialization after the recent history was read and
+        // before it is shared with the overlay. Simulate two quick finishes.
+        if (WaitForSingleObject(startupPaused, 5000) != WAIT_OBJECT_0) return 19;
+        History observed;
+        r.timestamp = 2000;
+        observed.add(r);
+        saveHistoryAsync(observed, r);
+        r.timestamp = 3000;
+        observed.add(r);
+        saveHistoryAsync(observed, r);
+        SetEvent(resumeStartup);
+        for (int i = 0; i < 400 && !diagnosticHistoryWrites(); ++i) Sleep(5);
+        if (!diagnosticHistoryWrites()) return 20;
+        History saved;
+        std::ifstream in(path, std::ios::binary);
+        if (!history_codec::load(in, saved) || saved.size() != 3) return 21;
+        if (saved.get(0)->timestamp != 3000 || saved.get(1)->timestamp != 2000 || saved.get(2)->timestamp != 1000) return 22;
+        std::puts("Early save preserves existing recent history and both observed hunts.");
+        return 0;
+    }
     History loaded;bool ready=false;
     for(int i=0;i<200&&!ready;++i){ready=takeLoadedHistory(loaded);if(!ready)Sleep(5);}
     if(!ready||loaded.size()!=1||loaded.get(0)->players[0].name!=r.players[0].name)return 2;

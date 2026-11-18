@@ -33,6 +33,36 @@ int main(){
         m.update(s,6100);CHECK(m.ranked()[1].participationMs==elapsed);
     }
     {
+        Meter model;
+        History archived;
+        const auto tick = [&](const Sample& observed, std::uint64_t now) {
+            updateHunt(model, observed, now, [&](bool interrupted) {
+                archived.add(captureHunt(model, now, now, interrupted));
+            });
+        };
+        tick(sample(1, 0), 0);
+        tick(sample(2, 0), 100);
+        tick(sample(2, 350), 350);
+        tick(Sample{}, 600);
+        auto next = sample(2, 20);
+        next.questId = 1591;
+        tick(next, 850);
+        CHECK(archived.size() == 1);
+        const auto* interrupted = archived.get(0);
+        CHECK(interrupted && interrupted->questId == 42 && interrupted->total() == 350);
+        CHECK(interrupted && interrupted->partial && !interrupted->success());
+        CHECK(model.questId() == 1591 && model.total() == 20);
+
+        next.state = 3;
+        next.players[0].damage = 40;
+        tick(next, 1100);
+        tick(sample(2, 10), 1350);
+        CHECK(archived.size() == 2);
+        const auto* completed = archived.get(0);
+        CHECK(completed && completed->questId == 1591 && completed->total() == 40);
+        CHECK(completed && !completed->partial && completed->success());
+    }
+    {
         History history;
         for(unsigned i=0;i<12;++i)history.add(record(1000+i));
         CHECK(history.size()==10 && history.get(0)->timestamp==1011 && history.get(9)->timestamp==1002);

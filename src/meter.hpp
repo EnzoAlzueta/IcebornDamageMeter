@@ -70,6 +70,11 @@ class Meter {
         peakParty_ = (std::max)(peakParty_, partySize);
     }
 public:
+    bool startsNewHunt(const Sample& sample) const {
+        return sample.valid && !sample.expedition && sample.state == 2 && sample.questId > 0 &&
+            (phase_ == Phase::Waiting || phase_ == Phase::Summary ||
+             sample.questId != questId_ || !previousInQuest_);
+    }
     // Counters are absolute mission totals, never add repeated samples.
     // Departed players stay in the denominator and the final summary.
     void update(const Sample& sample, std::uint64_t now) {
@@ -85,8 +90,7 @@ public:
         }
         expedition_=false;
         const bool inQuest = sample.state == 2 && sample.questId > 0;
-        if (inQuest && (phase_ == Phase::Waiting || phase_ == Phase::Summary ||
-                        sample.questId != questId_ || !previousInQuest_)) {
+        if (startsNewHunt(sample)) {
             players_ = {};
             questId_ = sample.questId;
             finishAt_ = 0;

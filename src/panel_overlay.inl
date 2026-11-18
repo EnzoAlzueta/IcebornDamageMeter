@@ -50,15 +50,51 @@ void refreshRows() {
         rows[i].subtitle=r.subtitle;
     }
 }
-void archiveCurrent(bool interrupted=false) {
-    if(!model.serial()||archivedSerial==model.serial())return;
-    auto record=captureHunt(model,GetTickCount64(),utcMilliseconds());
-    if(interrupted&&model.phase()==Phase::Live){record.partial=true;record.outcome=6;}
+bool archiveCurrent(std::uint64_t now, bool interrupted) {
+    if(!model.serial()||archivedSerial==model.serial())return false;
+    auto record=captureHunt(model,now,utcMilliseconds(),interrupted);
     bool any=false;for(const auto& p:record.players)if(p.id)any=true;
     archivedSerial=model.serial();activeStamp=record.timestamp;
-    if(!any)return;
+    if(!any)return false;
     panel.history.add(record);saveHistoryAsync(panel.history,record);
     log("Hunt archived: serial=%llu players=%u duration=%llu ms",archivedSerial,record.partySize,record.durationMs);
+    return true;
+}
+bool pollHunt(std::uint64_t now) {
+    if (now - lastPoll < 250) return false;
+    lastPoll = now;
+
+    bool changed = false;
+    static History stored;
+    if (takeLoadedHistory(stored)) {
+        stored.addNewer(panel.history);
+        panel.history = std::move(stored);
+        changed = true;
+    }
+    const auto before = model.phase();
+    const auto previousSerial = model.serial();
+    const bool wasExpedition = model.expedition();
+#ifdef METER_DIAGNOSTIC
+    const auto sample = diagnosticPendingSample ? std::move(*diagnosticPendingSample) : readSample();
+    diagnosticPendingSample.reset();
+#else
+    const auto sample = readSample();
+#endif
+    updateHunt(model, sample, now, [&](bool interrupted) {
+        if (archiveCurrent(now, interrupted)) changed = true;
+    });
+    visibility.update(sample);
+    if (model.serial() != previousSerial) {
+        panel.page = PanelPage::Current;
+        preview = false;
+        setEditing(false);
+        return true;
+    }
+
+    const auto after = model.phase();
+    const bool showsCurrentHunt = panel.page == PanelPage::Current || panel.page == PanelPage::Details;
+    return changed || (showsCurrentHunt && !preview &&
+        (after == Phase::Live || after == Phase::Settling || before != after || wasExpedition != model.expedition()));
 }
 void processAction(PendingAction command) {
     if(command.action==Action::CopyDamage) {
@@ -118,28 +154,7 @@ void poll() {
     } else {keys={};setEditing(false);}
     static bool lastEditing=false;
     if(lastEditing!=isEditing()){lastEditing=isEditing();changed=true;}
-    const auto now=GetTickCount64();
-    if(now-lastPoll>=250) {
-        lastPoll=now;
-        static History stored;
-        if(takeLoadedHistory(stored)) {
-            changed=true;
-            if(panel.history.size()==0)panel.history=std::move(stored);
-            else {auto recent=panel.history;panel.history=std::move(stored);
-                for(size_t i=recent.size();i>0;--i)panel.history.add(*recent.get(i-1));}
-        }
-        const auto before=model.phase();const auto previousSerial=model.serial();
-        auto sample=readSample();
-        if(sample.valid&&sample.expedition&&!model.expedition())archiveCurrent(true);
-        if(before==Phase::Settling && sample.valid && sample.state==2)archiveCurrent();
-        model.update(sample,now);visibility.update(sample);
-        if(model.serial()!=previousSerial) {
-            if(before==Phase::Live)log("Quest changed without an end state; previous comparison omitted.");
-            panel.page=PanelPage::Current;preview=false;setEditing(false);
-        }
-        if(before!=Phase::Summary&&model.phase()==Phase::Summary)archiveCurrent();
-        if((panel.page==PanelPage::Current||panel.page==PanelPage::Details)&&!preview)changed=true;
-    }
+    if (pollHunt(GetTickCount64())) changed = true;
     scale=static_cast<float>(panel.config.scale)/100;
     const bool nextVisible=preview||isEditing()||visibility.visible();
     if(nextVisible&&!visible)changed=true;

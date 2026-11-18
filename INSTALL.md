@@ -38,16 +38,12 @@ containing `MonsterHunterWorld.exe`.
 
 Keep Seamless's original `xinput9_1_0.dll`. Never overwrite a root or chain DLL
 owned by another mod. An unknown existing XInput proxy needs its own compatibility
-instructions. The minimal friend ZIP is an update for an existing Seamless setup;
-it contains no INI or saved history.
+instructions.
 
-Merge folders. When updating, keep your existing INI and history; replace only
-this mod's plugin and, only when required, its matching bootstrap. There is no
-installer or installation command. Do not copy the source ZIP into the game.
-
-For an existing working installation, use the **update-plugin-only ZIP** with
-the game closed. It preserves the loader, INI and both hunt files. The 0.6.14
-plugin works with the existing 0.6.11 meter bootstrap. New users need the full ZIP.
+The same standard ZIP serves new users and upgrades. If the meter already works,
+copy only `nativePC/plugins/iceborne_damage_meter.dll` from the ZIP to the matching
+path in the game folder. Keep your current loader, INI and both hunt files. The
+source ZIP contains the development files.
 
 ## Controls
 

@@ -1,13 +1,14 @@
 ICEBORN DAMAGE METER - INSTALLATION
 
 Close the game. Steam > Manage > Browse local files opens the EXE folder.
-Merge nativePC into the game folder.
+For a new meter installation, merge nativePC into the game folder.
 Without a loader, also copy xinput9_1_0.dll. With Stracker, copy ONLY nativePC.
 Never overwrite another mod's root or chain XInput DLL.
 
 Use DX11 or DX12 with SDR; the API is detected automatically.
 F8 show/hide; Ctrl+F8 preview; F6 settings; Ctrl+F6 menu; F7 history; Ctrl+F9 move.
-Preserve your INI and history when updating. Remove only our plugin to uninstall.
+If the meter already works, replace only nativePC/plugins/iceborne_damage_meter.dll
+from this ZIP. Keep your loader, INI and saved hunts. Remove our plugin to uninstall.
 Never delete nativePC or another mod's loader.
 
 English guide: IceborneDamageMeter/INSTALL.md

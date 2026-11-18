@@ -17,6 +17,7 @@ size_t archiveHead=0,archiveCount=0;
 unsigned archiveDropped=0;
 std::atomic<bool> archiveEnabled{true};
 bool loaded=false,pending=false;
+bool initialHistoryTaken=false, pendingNeedsInitialHistory=false;
 bool profilePending=false;
 ProfileSettings pendingProfile{};
 std::wstring storeFolder;
@@ -51,18 +52,18 @@ DWORD WINAPI historyWorker(void*) {
         } catch(...) {archiveReady=false;archive.close();log("Hunt archive initialization failed; recent history remains active.");}
     }
     archiveEnabled.store(archiveReady);
-    { std::lock_guard<std::mutex> lock(storeMutex); loadedHistory=std::move(history); loaded=true;
+    { std::lock_guard<std::mutex> lock(storeMutex); loadedHistory=history; loaded=true;
       if(!pending&&!profilePending&&!archiveCount)storageIdle.store(true); }
     for(;;) {
         if(WaitForSingleObject(storeEvent,INFINITE)!=WAIT_OBJECT_0) return 0;
         for(;;){
         History toSave; HuntRecord last;ProfileSettings profile{};
         HuntRecord toArchive;bool writeArchive=false;unsigned dropped=0;
-        bool writeHistory=false,writeProfile=false;
+        bool writeHistory=false,writeProfile=false,mergeInitialHistory=false;
         { std::lock_guard<std::mutex> lock(storeMutex); if(!pending&&!profilePending&&!archiveCount&&!archiveDropped){storageIdle.store(true);break;}
           storageIdle.store(false);
           writeHistory=pending;writeProfile=profilePending;
-          if(pending){toSave=pendingHistory;last=pendingLast;pending=false;}
+          if(pending){toSave=pendingHistory;last=pendingLast;mergeInitialHistory=pendingNeedsInitialHistory;pending=false;}
           if(profilePending){profile=pendingProfile;profilePending=false;}
           if(archiveCount){toArchive=std::move(archiveQueue[archiveHead]);archiveHead=(archiveHead+1)%ArchiveQueueCapacity;--archiveCount;writeArchive=true;}
           dropped=archiveDropped;archiveDropped=0; }
@@ -78,6 +79,13 @@ DWORD WINAPI historyWorker(void*) {
             } catch(...) {archiveReady=false;archiveEnabled.store(false);archive.close();log("Hunt archive write failed; recent history remains active.");}
         }
         if(writeHistory) {
+        // An early snapshot contains only hunts observed before the overlay
+        // received its initial history. Preserve the original on-disk records.
+        if (mergeInitialHistory) {
+            auto combined = history;
+            combined.addNewer(toSave);
+            toSave = std::move(combined);
+        }
         const auto temporary=path+L".tmp";
         bool ok=false;
         { std::ofstream out(std::filesystem::path(temporary),std::ios::binary|std::ios::trunc);
@@ -120,11 +128,12 @@ void startHistoryStore(const std::wstring& directory) {
 bool takeLoadedHistory(History& history) {
     std::lock_guard<std::mutex> lock(storeMutex);
     if(!loaded) return false;
-    history=std::move(loadedHistory); loaded=false; return true;
+    history=std::move(loadedHistory); loaded=false; initialHistoryTaken=true; return true;
 }
 void saveHistoryAsync(const History& history,const HuntRecord& last) {
     if(!storeEvent) return;
     { std::lock_guard<std::mutex> lock(storeMutex); storageIdle.store(false);pendingHistory=history; pendingLast=last; pending=true;
+      pendingNeedsInitialHistory = !initialHistoryTaken;
       if(archiveEnabled.load()){
           if(archiveCount<ArchiveQueueCapacity){archiveQueue[(archiveHead+archiveCount)%ArchiveQueueCapacity]=last;++archiveCount;}
           else ++archiveDropped;
