@@ -21,6 +21,8 @@ void diagnosticHidden(bool);
 void diagnosticPanelPage(int);
 void diagnosticPanelSize(int,int);
 void diagnosticRecapture(void*,IUnknown*);
+void diagnosticQuest(int,bool);
+bool diagnosticCompactValuesFit();
 }
 static void require(HRESULT result,const char* operation) {
     if(FAILED(result)){std::printf("%s: 0x%08lx\n",operation,static_cast<unsigned long>(result));throw std::runtime_error(operation);}
@@ -57,6 +59,8 @@ int main(int argc,char** argv) {
     const bool settings=mode.find("settings")!=std::string::npos;
     const bool history=mode.find("history")!=std::string::npos;
     const bool narrow=mode.find("narrow")!=std::string::npos;
+    const bool chinese=mode.find("zh-cn")!=std::string::npos;
+    const bool maximumCounters=mode.find("maximum")!=std::string::npos;
     const bool tinyScale=mode=="small";
     const bool focusTest=mode=="focus";
     const bool hiddenTest=mode=="hidden";
@@ -102,6 +106,8 @@ int main(int argc,char** argv) {
         if(narrow||tinyScale)meter::diagnosticPanelSize(260,tinyScale?40:100);
         if(localeJapanese||localeArabic)meter::setLanguage(localeJapanese?meter::Language::Japanese:meter::Language::Arabic);
         meter::diagnosticPreview(false,false);if(settings||history||localeJapanese||localeArabic)meter::diagnosticPanelPage(history?2:1);
+        if(chinese)meter::setLanguage(meter::Language::ChineseSimplified);
+        if(chinese||maximumCounters)meter::diagnosticQuest(1591,maximumCounters);
         D3D11_SAMPLER_DESC s{};s.Filter=D3D11_FILTER_MIN_MAG_MIP_LINEAR;s.AddressU=s.AddressV=s.AddressW=D3D11_TEXTURE_ADDRESS_WRAP;s.MaxLOD=D3D11_FLOAT32_MAX;
         ComPtr<ID3D11SamplerState> sentinel;require(device->CreateSamplerState(&s,&sentinel),"Sentinel sampler");
         D3D11_BUFFER_DESC bd{};bd.ByteWidth=64;bd.Usage=D3D11_USAGE_DEFAULT;bd.BindFlags=D3D11_BIND_CONSTANT_BUFFER;
@@ -147,6 +153,7 @@ int main(int argc,char** argv) {
             if(frame==23)require(chain->ResizeBuffers(flip?2:1,800,600,DXGI_FORMAT_R8G8B8A8_UNORM,0),"Resize back");
         }
         if(!pixelsBefore||!pixelsAfter||meter::diagnosticDx11Composites()<3)throw std::runtime_error("No UI pixels/composites around resize");
+        if((chinese||maximumCounters)&&!meter::diagnosticCompactValuesFit())throw std::runtime_error("Narrow compact values clipped or stacked");
         if(hiddenTest?meter::diagnosticCacheBuilds()<2:meter::diagnosticCacheBuilds()!=1)throw std::runtime_error("Unexpected UI cache rebuild count");
         if(meter::diagnosticDx11Rasterizations()<3||meter::diagnosticDx11Rasterizations()>=meter::diagnosticDx11Composites())
             throw std::runtime_error("DX11 static raster was not reused across frames/resizes");

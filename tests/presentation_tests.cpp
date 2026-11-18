@@ -90,9 +90,16 @@ int main() {
     CHECK(panel.config.scale==40);
     for(int i=0;i<100;++i)panel.change(Action::Decrease,2);
     CHECK(panel.config.width==260);
-    for(int width:{260,280,340,360,400,460,640})for(auto page:{PanelPage::Current,PanelPage::Details,PanelPage::History,PanelPage::Record,PanelPage::Settings,PanelPage::Menu}) {
+    float liveHeight=0;
+    for(int width:{260,280,340,359,360,400,460,640})for(auto page:{PanelPage::Current,PanelPage::Details,PanelPage::History,PanelPage::Record,PanelPage::Settings,PanelPage::Menu}) {
         panel.config.width=width;panel.page=page;view=panel.build(model,2000);
         const auto g=rowGeometry(view,static_cast<float>(width));
+        if(page==PanelPage::Current) {
+            CHECK(!view.narrow&&view.rowHeight==25&&g.valueY==3);
+            if(!liveHeight)liveHeight=view.height;
+            CHECK(view.height==liveHeight);
+            CHECK(g.nameX+g.nameWidth+8<=g.valueX);
+        }
         CHECK(g.nameWidth>0&&g.valueWidth>0&&g.subtitleWidth>0);
         CHECK(g.nameX+g.nameWidth<=width-10&&g.valueX+g.valueWidth<=width-10);
         CHECK(view.rowHeight>=g.valueY+20);

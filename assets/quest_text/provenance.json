@@ -1,0 +1,70 @@
+{
+  "source": "Installed Monster Hunter World localized quest GMDs",
+  "gameMemoryProfile": 421810,
+  "supportedExeSha256": "c2ebbbd2c49f216d484e31a5219bed419eb1e5e7d206d02cba040a3ab79d90ea",
+  "extractedOn": "2026-11-18",
+  "copyright": "CAPCOM; original game text, separate from MIT source code",
+  "selection": "Highest numeric chunk suffix for each identical file path; unavailable placeholder entries omitted",
+  "sourceFileCount": 7247,
+  "questCount": 512,
+  "coverage": {
+    "en": {
+      "names": 512,
+      "objectives": 512
+    },
+    "es": {
+      "names": 512,
+      "objectives": 512
+    },
+    "pt": {
+      "names": 512,
+      "objectives": 512
+    },
+    "fr": {
+      "names": 512,
+      "objectives": 512
+    },
+    "de": {
+      "names": 512,
+      "objectives": 512
+    },
+    "it": {
+      "names": 512,
+      "objectives": 512
+    },
+    "ja": {
+      "names": 512,
+      "objectives": 512
+    },
+    "ko": {
+      "names": 512,
+      "objectives": 512
+    },
+    "zh-CN": {
+      "names": 512,
+      "objectives": 512
+    },
+    "zh-TW": {
+      "names": 512,
+      "objectives": 512
+    },
+    "ru": {
+      "names": 512,
+      "objectives": 512
+    },
+    "pl": {
+      "names": 512,
+      "objectives": 512
+    },
+    "ar": {
+      "names": 512,
+      "objectives": 512
+    },
+    "es-419": {
+      "names": 512,
+      "objectives": 512
+    }
+  },
+  "csvSha256": "5e7fbf381a8c30c804a6ec43372609164add941ed2d34e763b66870929c3a006",
+  "sourceManifestSha256": "89875cfaa3c37675399ee925bc434ac1eb1fe3857ea5866ce5900000e980869d"
+}

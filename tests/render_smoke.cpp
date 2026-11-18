@@ -20,6 +20,8 @@ void diagnosticPanelPage(int page);
 void diagnosticPanelSize(int,int);
 void diagnosticHidden(bool);
 void diagnosticRecapture(void*,IUnknown*);
+void diagnosticQuest(int,bool);
+bool diagnosticCompactValuesFit();
 }
 static void require(HRESULT result, const char* operation) {
     if (FAILED(result)) {
@@ -153,6 +155,8 @@ int main(int argc, char** argv) {
     const bool settings = argc > 1 && std::strstr(argv[1], "settings") != nullptr;
     const bool history = argc > 1 && std::strstr(argv[1], "history") != nullptr;
     const bool narrow = argc > 1 && std::strstr(argv[1], "narrow") != nullptr;
+    const bool chinese = argc > 1 && std::strstr(argv[1], "zh-cn") != nullptr;
+    const bool maximumCounters = argc > 1 && std::strstr(argv[1], "maximum") != nullptr;
     const bool tinyScale = argc > 1 && std::strcmp(argv[1], "--small") == 0;
     const bool localeJapanese=argc>1&&std::strcmp(argv[1],"--locale-ja")==0;
     const bool localeArabic=argc>1&&std::strcmp(argv[1],"--locale-ar")==0;
@@ -219,6 +223,8 @@ int main(int argc, char** argv) {
         if(narrow||tinyScale)meter::diagnosticPanelSize(260,tinyScale?40:100);
         if(localeJapanese||localeArabic)meter::setLanguage(localeJapanese?meter::Language::Japanese:meter::Language::Arabic);
         meter::diagnosticPreview(gallery, zeroDamage);
+        if(chinese)meter::setLanguage(meter::Language::ChineseSimplified);
+        if(chinese||maximumCounters)meter::diagnosticQuest(1591,maximumCounters);
         if(localeJapanese||localeArabic)meter::diagnosticPanelPage(1);
         if(settings||history||record||menu)meter::diagnosticPanelPage(settings?1:history?2:menu?4:3);
         ComPtr<ID3D12CommandAllocator> allocator;
@@ -263,6 +269,7 @@ int main(int argc, char** argv) {
             if (frame == 4) require(chain->ResizeBuffers(2, 1024, 768, DXGI_FORMAT_R8G8B8A8_UNORM, 0), "ResizeBuffers");
             if (frame == 8) require(chain->ResizeBuffers(2, 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, 0), "ResizeBuffers back");
         }
+        if((chinese||maximumCounters)&&!meter::diagnosticCompactValuesFit())throw std::runtime_error("Narrow compact values clipped or stacked");
         if(hiddenTest?meter::diagnosticCacheBuilds()<2:meter::diagnosticCacheBuilds()!=(localeSwitch?2U:1U))throw std::runtime_error("Unexpected UI cache rebuild count");
         std::printf("UI cache: %u build(s) across 12 frames and two resizes.\n",meter::diagnosticCacheBuilds());
         testEditing(window);

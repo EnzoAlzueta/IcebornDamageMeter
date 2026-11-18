@@ -94,7 +94,7 @@ ProcessComPtr<IDWriteTextLayout> columnsLayout, comparisonLayout;
 std::array<ProcessComPtr<IDWriteTextLayout>,48> buttonLayouts;
 std::array<bool, 256> keys{};
 
-void layout(const std::wstring& value, float width, bool alignRight, ComPtr<IDWriteTextLayout>& target) {
+void layout(const std::wstring& value, float width, bool alignRight, ComPtr<IDWriteTextLayout>& target,bool fit=false) {
     target.Reset();
     if (!font || !writeFactory || value.empty()) return;
     font->SetTextAlignment(alignRight ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING);
@@ -102,9 +102,21 @@ void layout(const std::wstring& value, float width, bool alignRight, ComPtr<IDWr
     const auto hr = writeFactory->CreateTextLayout(value.c_str(), static_cast<UINT32>(value.size()),
         font.Get(), (std::max)(1.0f,width), 20, &target);
     if (FAILED(hr)) log("CreateTextLayout failed: 0x%08lx", static_cast<unsigned long>(hr));
-    else if(ellipsis) {
-        const DWRITE_TRIMMING trimming{DWRITE_TRIMMING_GRANULARITY_CHARACTER,0,0};
-        target->SetTrimming(&trimming,ellipsis.Get());
+    else {
+        // Measure only when rebuilding narrow live rows, never each frame.
+        if(fit) {
+            DWRITE_TEXT_METRICS metrics{};
+            target->SetMaxWidth(10000);
+            if(SUCCEEDED(target->GetMetrics(&metrics))&&metrics.widthIncludingTrailingWhitespace>width) {
+                const float size=(std::max)(9.0f,font->GetFontSize()*width/metrics.widthIncludingTrailingWhitespace*0.98f);
+                target->SetFontSize(size,DWRITE_TEXT_RANGE{0,static_cast<UINT32>(value.size())});
+            }
+            target->SetMaxWidth((std::max)(1.0f,width));
+        }
+        if(ellipsis) {
+            const DWRITE_TRIMMING trimming{DWRITE_TRIMMING_GRANULARITY_CHARACTER,0,0};
+            target->SetTrimming(&trimming,ellipsis.Get());
+        }
     }
     if(SUCCEEDED(hr)) {
         target->SetLocaleName(languageTag(),DWRITE_TEXT_RANGE{0,static_cast<UINT32>(value.size())});
@@ -126,7 +138,7 @@ void refreshLayouts() {
     layout(L"×", 16, false, closeLayout);
     for (size_t i = 0; i < rowCount; ++i) {
         layout(rows[i].name, geometry.nameWidth, false, rows[i].nameLayout);
-        layout(rows[i].value, geometry.valueWidth, true, rows[i].valueLayout);
+        layout(rows[i].value, geometry.valueWidth, true, rows[i].valueLayout,presentation.compact&&width<360);
         layout(rows[i].subtitle,geometry.subtitleWidth,false,rows[i].subtitleLayout);
     }
     for(size_t i=0;i<presentation.buttonCount;++i) layout(presentation.buttons[i].text,presentation.buttons[i].rect.width-8,false,buttonLayouts[i]);
@@ -372,6 +384,36 @@ bool diagnosticReady() {
     return ready && !disabled && bufferCount != 0;
 }
 unsigned diagnosticCacheBuilds(){return cacheBuilds;}
+void diagnosticQuest(int id,bool maximumCounters) {
+    std::lock_guard<std::mutex> lock(renderMutex);
+    settings();model=Meter{};
+    Sample sample;sample.valid=sample.countersValid=true;sample.questId=id;sample.state=2;
+    const wchar_t* names[]={L"孤鸟",L"柳贯一",L"梅巧莉",L"Hunter"};
+    for(size_t i=0;i<4;++i)sample.players[i]={i+1,names[i],0,i==2,true,static_cast<int>(i)};
+    const auto now=GetTickCount64();
+    model.update(sample,now-(maximumCounters?1000:490000));
+    const unsigned values[]={30242,13115,0,1000};
+    for(size_t i=0;i<4;++i)sample.players[i].damage=maximumCounters?100000000:values[i];
+    model.update(sample,now);
+    sample.state=3;model.update(sample,now);model.update(sample,now+3000);
+    preview=false;panel.page=PanelPage::Current;
+    if(!visibility.visible())visibility.toggle();
+    visible=true;refreshRequested=true;refreshRows();
+}
+bool diagnosticCompactValuesFit() {
+    std::lock_guard<std::mutex> lock(renderMutex);
+    if(!presentation.compact||presentation.narrow||presentation.rowHeight!=25||!rowCount)return false;
+    const auto geometry=rowGeometry(presentation,static_cast<float>(panel.config.width));
+    for(size_t i=0;i<rowCount;++i) {
+        if(!rows[i].valueLayout)return false;
+        DWRITE_TEXT_METRICS metrics{};
+        rows[i].valueLayout->SetMaxWidth(10000);
+        const auto hr=rows[i].valueLayout->GetMetrics(&metrics);
+        rows[i].valueLayout->SetMaxWidth(geometry.valueWidth);
+        if(FAILED(hr)||metrics.widthIncludingTrailingWhitespace>geometry.valueWidth+0.5f)return false;
+    }
+    return true;
+}
 unsigned diagnosticDx11Composites(){return dx11.compositeCount();}
 unsigned diagnosticDx11Rasterizations(){return dx11.rasterCount();}
 void diagnosticFocus(bool focused){diagnosticFocused=focused;}

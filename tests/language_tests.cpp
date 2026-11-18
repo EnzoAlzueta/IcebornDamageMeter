@@ -6,7 +6,10 @@ static int failures=0;
 #define CHECK(x) do{if(!(x)){std::printf("FAIL %d: %s\n",__LINE__,#x);++failures;}}while(0)
 int main() {
     CHECK(parseLanguage("brazilian")==Language::Portuguese);
-    CHECK(parseLanguage("ES_ar")==Language::Spanish);
+    CHECK(parseLanguage("ES_ar")==Language::SpanishLatinAmerica);
+    CHECK(parseLanguage("latam")==Language::SpanishLatinAmerica);
+    CHECK(parseLanguage("es-419")==Language::SpanishLatinAmerica);
+    CHECK(parseLanguage("spanish")==Language::Spanish);
     CHECK(parseLanguage("koreana")==Language::Korean);
     CHECK(parseLanguage("schinese")==Language::ChineseSimplified);
     CHECK(parseLanguage("tchinese")==Language::ChineseTraditional);
@@ -38,8 +41,15 @@ int main() {
     setLanguage(Language::English);CHECK(std::wstring(tr(L"Settings"))==L"Settings");
     CHECK(questName(103)==L"The Great Jagras Hunt");
     setLanguage(Language::Spanish);CHECK(questName(103)==L"La cacería del Gran Jagras");
-    setLanguage(Language::ChineseSimplified);CHECK(questName(103)==L"The Great Jagras Hunt");
+    setLanguage(Language::ChineseSimplified);
+    CHECK(questName(103)==L"狩猎大贼龙吧");
+    CHECK(questName(1591)==L"翔风之龙"&&questObjective(1591)==L"讨伐钢龙");
+    CHECK(questName(30000)==tr(L"Investigation")&&questObjective(30000).empty());
+    setLanguage(Language::ChineseTraditional);CHECK(questName(1591)==L"翔風之龍");
+    setLanguage(Language::SpanishLatinAmerica);
+    CHECK(questName(1225)==L"Si nos ayudas...");
+    CHECK(std::wstring(tr(L"Settings"))==L"Ajustes");
     setLanguage(static_cast<Language>(99));CHECK(currentLanguage()==Language::English);
-    std::puts(failures?"Language tests FAILED":"13 locales: UI, weapon names, quests/fallbacks, clipboard, priority and cache revision passed");
+    std::puts(failures?"Language tests FAILED":"13 UI languages, 14 game-text locales: quests, clipboard, priority and cache revision passed");
     return failures?1:0;
 }

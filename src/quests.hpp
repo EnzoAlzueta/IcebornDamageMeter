@@ -5,6 +5,7 @@
 #include <iterator>
 #include <string>
 namespace meter {
+static_assert(QuestLocaleCount==LanguageCount,"Quest catalog and runtime locale order must match");
 inline const QuestInfo* questInfo(int id) {
     const auto end=std::end(QuestCatalog);
     const auto found=std::lower_bound(std::begin(QuestCatalog),end,id,

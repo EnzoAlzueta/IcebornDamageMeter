@@ -4,3 +4,8 @@ ui/common/tex/cmn_item00_ID.tex (chunkG0.bin), equipment row, for this UI mod.
 This game artwork is separate from the project's original MIT-licensed code.
 See game_weapon_icons.json for the texture digest, crop and native type mapping.
 No chunk extractor, decompressor, full atlas or third-party DLL is distributed.
+
+Official quest text in assets/quest_text is also copyright CAPCOM and is separate
+from the MIT code license. Only names/objectives are included, not raw GMDs,
+quest descriptions, full game archives or extraction tools. See its README and
+provenance record for the supported profile and text normalization.

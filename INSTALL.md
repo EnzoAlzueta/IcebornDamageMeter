@@ -72,9 +72,11 @@ English. Steam detection retries during the first minute. The mod does not chang
 game or Steam settings. Restart the game after changing its language.
 
 Optional overrides: `en`, `es`, `pt-BR`, `fr`, `de`, `it`, `ja`, `ko`, `zh-CN`,
-`zh-TW`, `ru`, `pl`, `ar`. A missing setting also means automatic detection.
-Missing quest translations use English; the upstream quest catalog has no
-Simplified Chinese titles. Player names and saved data are preserved.
+`zh-TW`, `ru`, `pl`, `ar`, `es-419`. A missing setting also means automatic detection.
+Steam's Latin American Spanish uses the game's distinct names/objectives and
+shares Spanish UI labels. Official text covers 512 installed PC quest IDs,
+including Simplified Chinese. Unmatched legacy translations retain English
+fallback; unknown custom quests remain numbered. Player data is preserved.
 
 ## Copy damage summary
 

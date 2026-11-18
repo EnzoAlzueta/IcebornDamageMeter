@@ -10,6 +10,12 @@ This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
+**Development candidate: 0.6.15.** Keeps the compact meter one line per hunter
+down to width 260. Uses official localized quest names/objectives, including
+Simplified Chinese and a distinct Latin American Spanish game-text variant.
+Generic investigations retain their translated label without a guessed target.
+This candidate is separate from the published 0.6.14 beta.
+
 **Changes since 0.6.11-r2:** removes in-game chat sending; the manual
 clipboard action remains available. Includes saved settings to hide the DM shortcut
 and use manual panel visibility. With the panel and shortcut hidden, GPU drawing
@@ -71,7 +77,9 @@ profile 421810. Unsupported executable hashes disable damage reading.
 **Expedition and Guiding Lands damage are not supported.** Those contexts show
 no data rather than reusing a previous mission. Multi-target quests show mission
 totals, not per-monster attribution. Investigations sharing generic ID 30000 are
-excluded from personal DPS comparisons. Missing quest translations use English.
+excluded from personal DPS comparisons. Official game text covers 512 installed
+PC quest IDs; legacy entries without matching game text retain English fallback.
+Unknown custom quests remain numbered. See [text provenance](assets/quest_text/README.md).
 
 DPS excludes damage already present at first observation and includes time spent
 present, including pauses and travel. It is not active attack time or a normalized
@@ -105,7 +113,7 @@ claim applies universally to other systems.
 
 Original project code is MIT; see [LICENSE](LICENSE). Dependencies and technical
 references are listed in [THIRD_PARTY.md](THIRD_PARTY.md). Extracted weapon artwork
-is copyright CAPCOM and is separate from the code license; attribution does not
+and official quest text are copyright CAPCOM and separate from the code license; attribution does not
 grant additional redistribution rights. No third-party loaders,
 full game atlases or extraction tools are bundled. The bootstrap is original
 project code, not a copy of a loader or Microsoft's XInput DLL.
@@ -116,4 +124,5 @@ OpenAI Codex was used to generate and revise code, interface translations,
 documentation, mod-page text and HTML/CSS promotional layouts. The author directed
 features and adjustments and tested the mod in-game with another player.
 UI preview images are diagnostic renders with labeled sample data, not generated
-gameplay screenshots. Original CAPCOM weapon icons are not AI-generated artwork.
+gameplay screenshots. Original CAPCOM weapon icons and official game quest text
+are not AI-generated artwork or AI translations.

@@ -91,9 +91,13 @@ datos que todavía estén en la cola.
 
 `Language=auto` bajo `[Overlay]` en el INI usa el idioma del juego configurado
 en Steam. Reiniciá el juego después de cambiarlo. Opciones manuales:
-`en`, `es`, `pt-BR`, `fr`, `de`, `it`, `ja`, `ko`, `zh-CN`, `zh-TW`, `ru`, `pl`, `ar`.
-Los títulos de misiones sin traducción aparecen en inglés. Se conservan los
-nombres de jugadores.
+`en`, `es`, `pt-BR`, `fr`, `de`, `it`, `ja`, `ko`, `zh-CN`, `zh-TW`, `ru`, `pl`, `ar`, `es-419`.
+El español latinoamericano usa sus textos de misión propios y comparte etiquetas
+de interfaz en español. Se incluyen nombres/objetivos oficiales de 512 IDs del
+juego en PC, también en chino simplificado. Las entradas antiguas sin coincidencia
+conservan inglés como respaldo; las misiones desconocidas siguen numeradas.
+Se conservan los nombres de jugadores. El panel compacto mantiene una fila por
+cazador hasta ancho 260; las páginas detalladas conservan su diseño estrecho.
 
 ## Copiar resumen de daño
 

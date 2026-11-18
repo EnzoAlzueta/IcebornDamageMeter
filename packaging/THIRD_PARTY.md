@@ -13,6 +13,10 @@ third-party components.
   MIT. [License](licenses/MHWorldData-LICENSE.txt). Catalog revision:
   `be7362213d7d1e30b794e3b58d3f87712035658d`.
   https://github.com/gatheringhallstudios/MHWorldData
+- Official localized quest names/objectives: CAPCOM game text, separate from
+  the code and legacy CSV licenses. [Game notice](licenses/Game-artwork-NOTICE.txt).
+  The source package records text coverage and extraction provenance. Raw game
+  archives, GMD files and extraction tools are not bundled.
 - Fourteen original weapon icons: CAPCOM game artwork, separate from the code
   license. [Artwork notice](licenses/Game-artwork-NOTICE.txt). Extraction metadata
   is available in the developer source package. Attribution is not a grant of

@@ -1,5 +1,29 @@
 # Validation status
 
+## 0.6.15 compact width and official quest text candidate — 2026-11-18
+
+All 54 local tests passed in 35.66 seconds. New DX11/DX12 fixtures render the
+Chinese quest from the report at width 260 and stress maximum counter values.
+They check actual text metrics fit the numeric column without clipping/stacking.
+Their diagnostic BMPs were visually inspected. Presentation tests check equal
+live-panel height at 260/280/340/359/360/400/460/640 and keep detail-page geometry.
+These are fixture checks; actual gameplay validation remains pending.
+
+Read-only offline inspection of installed GMDs verified q01591_chS as 翔风之龙
+with objective 讨伐钢龙. The old catalog explicitly substituted English for
+Simplified Chinese. Official resources now supply 512 usable PC quest IDs with
+names/objectives in fourteen game-text locales. The merged catalog has 562 IDs,
+including 42 exact-English-title/objective aliases and eight unmatched legacy
+IDs. Those legacy entries retain earlier fallback; unknown custom IDs are numbered.
+Two Arabic gender tags use their first official variant; no gender is sampled.
+
+The generic q30000 resources contain Unavailable rather than procedural target
+information. ID 30000 therefore retains its translated Investigation label and
+no guessed objective. Latin American Spanish uses spL text while the thirteen
+UI languages still use the existing twelve translation columns. Localization
+audit passed for 100 source strings. No game data is written and no archive
+schema changes, per-frame file reads or translation/network dependency are added.
+
 ## 0.6.14 chat removal candidate — 2026-11-17
 
 Removed both in-game chat transports, the menu send action, the chat-key setting

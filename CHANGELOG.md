@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.15 — development candidate
+
+- Keep the compact damage meter on one line per hunter below width 360, down to
+  the existing minimum 260. Narrow live rows allocate more space to numbers and
+  fit long values when layouts rebuild; detailed pages keep their stacked mode.
+- Prefer official game names/objectives for 512 installed PC quest IDs, including
+  Simplified Chinese. Expand the catalog with verified game IDs and exact-text
+  aliases for legacy database IDs. No runtime extraction or translation service.
+- Select Latin American Spanish quest text separately while reusing Spanish UI.
+- Keep a translated Investigation label for generic ID 30000: its text resource
+  contains Unavailable, so this change does not invent dynamic targets.
+- Preserve history/archive formats, visibility behavior, removed chat and logging.
+- Add narrow Chinese/max-counter DX11/DX12 regressions. Local validation below.
+
 ## 0.6.14 — beta update
 
 This update also includes the unpublished 0.6.12/0.6.13 work:

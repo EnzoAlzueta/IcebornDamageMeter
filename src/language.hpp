@@ -7,7 +7,8 @@
 #include <string>
 #include <string_view>
 namespace meter {
-enum class Language:unsigned {English,Spanish,Portuguese,French,German,Italian,Japanese,Korean,ChineseSimplified,ChineseTraditional,Russian,Polish,Arabic,Count};
+// Latin American Spanish reuses Spanish UI strings, with its own game text.
+enum class Language:unsigned {English,Spanish,Portuguese,French,German,Italian,Japanese,Korean,ChineseSimplified,ChineseTraditional,Russian,Polish,Arabic,SpanishLatinAmerica,Count};
 inline constexpr size_t LanguageCount=static_cast<size_t>(Language::Count);
 inline std::atomic<Language> activeLanguage{Language::English};
 inline std::atomic<unsigned> languageRevision{0};
@@ -22,21 +23,22 @@ inline const wchar_t* tr(const wchar_t* source) {
     const auto found=std::lower_bound(std::begin(UiTranslations),end,key,
         [](const UiTranslation& row,std::wstring_view value){return std::wstring_view(row.source)<value;});
     if(found==end||std::wstring_view(found->source)!=key)return source;
-    const auto ordinal=static_cast<unsigned>(language);
+    const auto ordinal=static_cast<unsigned>(language==Language::SpanishLatinAmerica?Language::Spanish:language);
     return found->values[ordinal-1];
 }
 inline const wchar_t* languageTag() {
-    constexpr const wchar_t* tags[]={L"en-US",L"es-ES",L"pt-BR",L"fr-FR",L"de-DE",L"it-IT",L"ja-JP",L"ko-KR",L"zh-CN",L"zh-TW",L"ru-RU",L"pl-PL",L"ar-SA"};
+    constexpr const wchar_t* tags[]={L"en-US",L"es-ES",L"pt-BR",L"fr-FR",L"de-DE",L"it-IT",L"ja-JP",L"ko-KR",L"zh-CN",L"zh-TW",L"ru-RU",L"pl-PL",L"ar-SA",L"es-419"};
     return tags[static_cast<unsigned>(currentLanguage())];
 }
 inline const char* languageCode() {
-    constexpr const char* codes[]={"en","es","pt-BR","fr","de","it","ja","ko","zh-CN","zh-TW","ru","pl","ar"};
+    constexpr const char* codes[]={"en","es","pt-BR","fr","de","it","ja","ko","zh-CN","zh-TW","ru","pl","ar","es-419"};
     return codes[static_cast<unsigned>(currentLanguage())];
 }
 inline std::optional<Language> parseLanguage(std::string_view input) {
     std::string value;for(const char c:input)if(c!=' '&&c!='\t')value+=c=='_'?'-':c>='A'&&c<='Z'?char(c-'A'+'a'):c;
     if(value=="english"||value=="en"||value.rfind("en-",0)==0)return Language::English;
-    if(value=="spanish"||value=="latam"||value=="es"||value.rfind("es-",0)==0)return Language::Spanish;
+    if(value=="latam"||(value.rfind("es-",0)==0&&value!="es-es"))return Language::SpanishLatinAmerica;
+    if(value=="spanish"||value=="es"||value=="es-es")return Language::Spanish;
     if(value=="brazilian"||value=="portuguese"||value=="pt"||value.rfind("pt-",0)==0)return Language::Portuguese;
     if(value=="french"||value=="fr"||value.rfind("fr-",0)==0)return Language::French;
     if(value=="german"||value=="de"||value.rfind("de-",0)==0)return Language::German;

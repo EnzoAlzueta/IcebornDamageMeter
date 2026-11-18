@@ -58,6 +58,9 @@ The panel appears automatically during a mission. Default controls:
 
 Existing INI key bindings are preserved. Settings include scale 40–175%, width
 260–640, opacity, rows and columns. Settings and the ten-hunt history are saved.
+The compact damage panel stays one line per hunter throughout that width range;
+below 360 it gives short names less space and fits long numeric values as needed.
+Details/history/settings retain their readable multi-line narrow layouts.
 Observed DPS includes time present, including travel and pauses; it is not active
 attack time or a normalized skill score. Multi-target quests show mission totals.
 
@@ -88,8 +91,11 @@ active and are reported in the plugin log. A sudden exit can lose queued data.
 
 `Language=auto` under `[Overlay]` in the INI follows the game's Steam language.
 Restart the game after changing it. Optional overrides: `en`, `es`, `pt-BR`,
-`fr`, `de`, `it`, `ja`, `ko`, `zh-CN`, `zh-TW`, `ru`, `pl`, `ar`.
-Missing quest translations fall back to English. Player names are preserved.
+`fr`, `de`, `it`, `ja`, `ko`, `zh-CN`, `zh-TW`, `ru`, `pl`, `ar`, `es-419`.
+Latin American Spanish follows its distinct game quest text and shares Spanish
+UI labels. Official quest names/objectives cover 512 installed PC IDs, including
+Simplified Chinese. Unmatched legacy translations retain English fallback;
+unknown/custom quests remain numbered. Player names are preserved.
 
 ## Copy damage summary
 

@@ -73,7 +73,7 @@ inline RowGeometry rowGeometry(const PanelView& view,float width) {
         g.nameWidth=g.valueX-26;
         g.valueWidth=view.settings?60.0f:144.0f;
     } else {
-        g.valueX=width*0.4f;
+        g.valueX=view.compact&&width<360?(std::max)(96.0f,width*0.35f):width*0.4f;
         g.nameWidth=g.valueX-52;
         g.valueWidth=width-g.valueX-16;
     }
@@ -140,8 +140,10 @@ public:
     PanelView build(const Meter& model,std::uint64_t now,std::uint64_t activeStamp=0) const {
         PanelView view;
         const float width=static_cast<float>(config.width);
-        view.narrow=config.width<360;
         view.compact=page==PanelPage::Current;
+        // The live meter stays one line per hunter at every supported width.
+        // Detail/settings pages retain their two-line layout for long labels.
+        view.narrow=!view.compact&&config.width<360;
         view.bodyTop=view.compact?24.0f:55.0f;view.rowHeight=view.compact?25.0f:28.0f;
         if(view.narrow)view.rowHeight=44;
         if(!view.compact)view.button({width-56,4,24,24},L"‹",Action::Current);

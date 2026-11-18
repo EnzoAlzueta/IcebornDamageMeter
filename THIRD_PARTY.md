@@ -49,6 +49,13 @@ license. scripts/generate-quest-catalog.py generates the offline header.
 Runtime packages include MHWorldData-LICENSE.txt. Missing translations use English;
 upstream Chinese titles are Traditional, not Simplified.
 
+Starting with 0.6.15, the generated catalog gives precedence to official names
+and objectives extracted from the installed game's localized GMD resources.
+assets/quest_text records CAPCOM attribution, coverage and provenance; this text
+is separate from the MIT code/upstream CSV license. Raw GMDs, chunk files,
+decoder libraries and extraction tools are not distributed. The existing game
+notice also covers these strings. Generic investigation placeholders are omitted.
+
 ## Game artwork
 
 The fourteen weapon icons are extracted from the local game's
