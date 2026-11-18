@@ -2,7 +2,7 @@
 
 ## 0.6.15 compact width and official quest text candidate — 2026-11-18
 
-All 54 local tests passed in 35.66 seconds. New DX11/DX12 fixtures render the
+All 54 local tests passed. New DX11/DX12 fixtures render the
 Chinese quest from the report at width 260 and stress maximum counter values.
 They check actual text metrics fit the numeric column without clipping/stacking.
 Their diagnostic BMPs were visually inspected. Presentation tests check equal

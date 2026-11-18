@@ -388,7 +388,7 @@ void diagnosticQuest(int id,bool maximumCounters) {
     std::lock_guard<std::mutex> lock(renderMutex);
     settings();model=Meter{};
     Sample sample;sample.valid=sample.countersValid=true;sample.questId=id;sample.state=2;
-    const wchar_t* names[]={L"孤鸟",L"柳贯一",L"梅巧莉",L"Hunter"};
+    const wchar_t* names[]={L"孤鸟",L"柳贯一",L"梅巧莉",tr(L"Hunter")};
     for(size_t i=0;i<4;++i)sample.players[i]={i+1,names[i],0,i==2,true,static_cast<int>(i)};
     const auto now=GetTickCount64();
     model.update(sample,now-(maximumCounters?1000:490000));
