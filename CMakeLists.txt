@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(IceborneDamageMeter VERSION 0.6.16 LANGUAGES C CXX RC)
+project(IceborneDamageMeter VERSION 0.6.17 LANGUAGES C CXX RC)
 if(NOT WIN32 OR NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   message(FATAL_ERROR "Use MSVC for Windows x64 (Visual Studio 2022 or later).")
 endif()

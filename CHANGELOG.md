@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.17
+
+- Keep settings rows at the same height across all supported panel widths (260-640).
+
 ## 0.6.16 — development candidate
 
 - Preserve the previous hunt as partial if sampling jumps directly to a new quest.

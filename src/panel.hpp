@@ -142,8 +142,8 @@ public:
         const float width=static_cast<float>(config.width);
         view.compact=page==PanelPage::Current;
         // The live meter stays one line per hunter at every supported width.
-        // Detail/settings pages retain their two-line layout for long labels.
-        view.narrow=!view.compact&&config.width<360;
+        // Settings also keep each value and its controls beside the label.
+        view.narrow=!view.compact&&page!=PanelPage::Settings&&config.width<360;
         view.bodyTop=view.compact?24.0f:55.0f;view.rowHeight=view.compact?25.0f:28.0f;
         if(view.narrow)view.rowHeight=44;
         if(!view.compact)view.button({width-56,4,24,24},L"‹",Action::Current);
@@ -160,7 +160,7 @@ public:
             }
             view.footer=L"Ctrl+"+keyName(config.settingsKey)+tr(L" opens/closes this menu");
         } else if(page==PanelPage::Settings) {
-            view.settings=true;view.rowHeight=view.narrow?44.0f:25.0f;view.bodyTop=42;view.title=tr(L"LOG · SETTINGS");
+            view.settings=true;view.rowHeight=25;view.bodyTop=42;view.title=tr(L"LOG · SETTINGS");
             const wchar_t* labels[]={tr(L"Scale"),tr(L"Opacity"),tr(L"Width"),tr(L"Total damage"),tr(L"Percentage"),tr(L"Observed DPS"),
                 tr(L"Participation time"),tr(L"Personal comparison"),tr(L"Visible rows"),tr(L"Show / hide"),tr(L"History"),tr(L"Settings"),tr(L"Move panel"),tr(L"Show DM button"),tr(L"Show on quest start")};
             const bool flags[]={config.damage,config.share,config.dps,config.time,config.comparison};
@@ -177,7 +177,7 @@ public:
                 if(i==12)row.value=L"Ctrl+"+keyName(config.moveKey);
                 if(i==13)row.value=config.showBadge?tr(L"Yes"):tr(L"No");
                 if(i==14)row.value=config.autoShow?tr(L"Yes"):tr(L"No");
-                const float y=view.bodyTop+i*view.rowHeight+(view.narrow?20.0f:0.0f);
+                const float y=view.bodyTop+i*view.rowHeight;
                 view.button({width-66,y+1,24,22},L"−",Action::Decrease,i);
                 view.button({width-36,y+1,24,22},L"+",Action::Increase,i);
             }

@@ -90,7 +90,7 @@ int main() {
     CHECK(panel.config.scale==40);
     for(int i=0;i<100;++i)panel.change(Action::Decrease,2);
     CHECK(panel.config.width==260);
-    float liveHeight=0;
+    float liveHeight=0,settingsHeight=0;
     for(int width:{260,280,340,359,360,400,460,640})for(auto page:{PanelPage::Current,PanelPage::Details,PanelPage::History,PanelPage::Record,PanelPage::Settings,PanelPage::Menu}) {
         panel.config.width=width;panel.page=page;view=panel.build(model,2000);
         const auto g=rowGeometry(view,static_cast<float>(width));
@@ -99,6 +99,16 @@ int main() {
             if(!liveHeight)liveHeight=view.height;
             CHECK(view.height==liveHeight);
             CHECK(g.nameX+g.nameWidth+8<=g.valueX);
+        }
+        if(page==PanelPage::Settings) {
+            if(!settingsHeight)settingsHeight=view.height;
+            CHECK(view.height==settingsHeight&&view.rowHeight==25&&g.valueY==g.nameY);
+            for(size_t i=0;i<view.buttonCount;++i) {
+                const auto& button=view.buttons[i];
+                if(button.action!=Action::Increase&&button.action!=Action::Decrease)continue;
+                CHECK(button.rect.y==view.bodyTop+button.data*view.rowHeight+1);
+                CHECK(g.valueX+g.valueWidth<=button.rect.x);
+            }
         }
         CHECK(g.nameWidth>0&&g.valueWidth>0&&g.subtitleWidth>0);
         CHECK(g.nameX+g.nameWidth<=width-10&&g.valueX+g.valueWidth<=width-10);

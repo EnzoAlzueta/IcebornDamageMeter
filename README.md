@@ -5,15 +5,14 @@ Windows x64. No separate overlay application or translation service is required.
 
 ![Iceborn Damage Meter compact panel showing damage, team share and DPS for four hunters with sample data](assets/readme/damage-meter-preview.png)
 
-**GitHub beta: 0.6.14.** Download the full installation or the existing-users
-update from the [release page](https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.14).
+**GitHub beta: 0.6.17.** Download the standard Windows ZIP for new installations and updates from the [release page](https://github.com/EnzoAlzueta/IcebornDamageMeter/releases/tag/v0.6.17).
 The mod is also available on [Nexus Mods](https://www.nexusmods.com/monsterhunterworld/mods/8969).
 This repository contains the source code and developer tools.
 The interface supports 13 languages. This remains experimental pre-1.0 software
 with limited field coverage.
 
-**Development candidate: 0.6.16.** Keeps the compact meter one line per hunter
-down to width 260. Uses official localized quest names/objectives, including
+**Version 0.6.17.** Keeps the compact meter one line per hunter
+down to width 260. Settings also keep each option and its controls on one line. Uses official localized quest names/objectives, including
 Simplified Chinese and a distinct Latin American Spanish game-text variant.
 Generic investigations retain their translated label without a guessed target.
 It also improves history persistence and keeps sampling when rendering stops.
