@@ -1,4 +1,5 @@
 # Iceborn Damage Meter
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/imkyril)
 
 A compact, in-process damage meter for **Monster Hunter World: Iceborne** on
 Windows x64. No separate overlay application or translation service is required.
