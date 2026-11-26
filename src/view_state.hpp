@@ -29,7 +29,7 @@ public:
     void update(const Sample& sample) {
         if (!sample.valid) return;
         const bool live = sample.expedition || (sample.questId > 0 && sample.state == 2);
-        const int context=sample.expedition?-1:sample.questId;
+        const int context=isGuidingLands(sample)?-GuidingLandsStage:sample.expedition?-1:sample.questId;
         if (automatic_ && live && (!inQuest_ || context != quest_)) manual_ = Manual::Auto;
         inQuest_ = live;
         quest_ = context;

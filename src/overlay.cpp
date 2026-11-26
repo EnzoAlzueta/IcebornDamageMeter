@@ -11,6 +11,8 @@
 #include <chrono>
 #include <optional>
 #include "panel.hpp"
+#include "../dependencies/preview-dev.1/iceborn_preview.hpp"
+#include "../dependencies/settings-dev.1/iceborn_settings.h"
 #include "view_state.hpp"
 #include "weapon_icons.hpp"
 #include "dx11_surface.hpp"
@@ -189,6 +191,7 @@ void saveSettings() {
     }};
     saveProfileAsync(values);
 }
+#include "suite_settings.inl"
 #include "panel_overlay.inl"
 void disableRendering() {
     disabled = true;
@@ -334,6 +337,11 @@ void drawOverlay(void* raw, UINT flags) {
         return;
     }
     if (resizing) return;
+    if(suiteEditing.load()) {
+        pollHunt(GetTickCount64());
+        return;
+    }
+    if(suitePreviewBuilt){suitePreviewBuilt=false;refreshRequested=true;}
     poll();
     static bool fullyHidden=false;
     if(!visible&&!panel.config.showBadge){
@@ -473,4 +481,71 @@ void diagnosticPanelPage(int page) {
     visible=true;refreshRequested=true;refreshRows();
 }
 #endif
+}
+
+extern "C" __declspec(dllexport) const IcebornSettings* IcebornConnectMeterSettings(uint32_t abi,IcebornOpenSettings open) {
+    if(abi!=ICEBORN_SETTINGS_ABI || !open) return nullptr;
+    meter::suiteOpen.store(open);
+    return &meter::meterSettings;
+}
+
+extern "C" __declspec(dllexport) int IcebornMenuInputV1(HWND window,int enable,POINT* cursor,int* pressed) {
+    // The suite borrows the meter cursor only while its in-game menu owns input.
+    if(!cursor) {
+        if(enable && !meter::installInput(window)) return 0;
+        if(!enable)meter::waitForSettingsRelease=true;
+        meter::suiteEditing.store(enable!=0);
+        meter::setEditing(enable!=0);
+        return 1;
+    }
+    bool down=false;
+    if(!pressed || !meter::getEditPointer(*cursor,down)) return 0;
+    *pressed=down;
+    return 1;
+}
+
+static int drawSuitePreview(void* chain,const IcebornPreviewArea* area,int row,int value) {
+    using namespace meter;
+    std::unique_lock lock(renderMutex,std::try_to_lock);
+    if(!lock || !area || disabled || resizing || !gameDevice11 || !matches(chain))return 0;
+    settings();
+    if(!ready)ready=initializeGraphics();
+    if(!ready || !targets[0])return 0;
+    struct RestoreConfig {
+        PanelConfig& target;
+        PanelConfig saved;
+        ~RestoreConfig(){target=saved;}
+    } restore{panel.config,panel.config};
+    if(row>=2 && row<=5 && value>=meterOptions[row].minimum && value<=meterOptions[row].maximum) {
+        switch(row) {
+        case 2: panel.config.scale=value;break;
+        case 3: panel.config.opacity=value;break;
+        case 4: panel.config.width=value;break;
+        case 5: panel.config.maxRows=value;break;
+        }
+    }
+    static PanelConfig previous;
+    if(!suitePreviewBuilt || refreshRequested || previous.width!=panel.config.width ||
+       previous.maxRows!=panel.config.maxRows) {
+        refreshRows(true);
+        refreshLayouts();
+        suitePreviewBuilt=true;
+        refreshRequested=false;
+    }
+    if(previous.opacity!=panel.config.opacity)sceneDirty=true;
+    previous=panel.config;
+    const bool wasVisible=visible;
+    visible=true;
+    scale=panel.config.scale/100.f;
+    paint(0,area);
+    visible=wasVisible;
+    return !disabled;
+}
+
+extern "C" __declspec(dllexport) int IcebornDrawMeterPreviewV1(void* chain,const IcebornPreviewArea* area) {
+    return drawSuitePreview(chain,area,-1,0);
+}
+
+extern "C" __declspec(dllexport) int IcebornDrawMeterSettingPreview(void* chain,const IcebornPreviewArea* area,int row,int value) {
+    return drawSuitePreview(chain,area,row,value);
 }

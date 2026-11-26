@@ -105,6 +105,10 @@ int main(){
             if(action==Action::Settings)settings=true;
         }
         CHECK(details&&history&&settings);
+        const auto disconnected=panel.build(m,100,0,false);
+        CHECK(disconnected.rowCount+1==view.rowCount);
+        CHECK(disconnected.buttonCount+1==view.buttonCount);
+        for(size_t i=0;i<disconnected.buttonCount;++i) CHECK(disconnected.buttons[i].action!=Action::Settings);
         panel.change(Action::Details);view=panel.build(m,100);CHECK(!view.compact && !view.footer.empty());
         panel.change(Action::Current);view=panel.build(m,100);CHECK(view.compact && view.comparison.empty());
         PanelConfig bad;bad.showKey=bad.settingsKey;bad.scale=999;bad.normalize();CHECK(bad.showKey!=bad.settingsKey && bad.scale==175);

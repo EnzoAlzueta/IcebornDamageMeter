@@ -56,6 +56,53 @@ int main() {
         }
     }
     {
+        Meter field;
+        Visibility visible;
+        unsigned archived = 0;
+        const auto poll = [&](const Sample& observation, std::uint64_t now) {
+            updateHunt(field, observation, now, [&](bool) { ++archived; });
+            visible.update(observation);
+        };
+        poll(sample, 100);
+        Sample guiding;
+        guiding.valid = guiding.expedition = true;
+        guiding.stage = GuidingLandsStage;
+        poll(guiding, 200);
+        CHECK(archived==1&&visible.visible()&&field.guidingLands()&&field.total()==0&&!canCopyDamage(field,false));
+        guiding.countersValid = true;
+        guiding.players[0] = {1,L"Enzo",0,true,true,0};
+        poll(guiding, 300);
+        const auto visit = field.serial();
+        guiding.players[0].damage = 150;
+        poll(guiding, 1300);
+        poll(guiding, 1300);
+        CHECK(field.serial()==visit&&field.total()==150&&field.ranked()[0].dps()==150.0);
+        Panel fieldPanel;
+        const auto personal = fieldPanel.build(field,1300);
+        CHECK(personal.rowCount==1&&personal.title==L"Tierras Destino · Daño propio");
+        CHECK(personal.rows[0].value.find(L'%')==std::wstring::npos);
+        CHECK(canCopyDamage(field,false)&&!canCopyDamage(field,true));
+        const auto copied = damageSummaryLines(captureHunt(field,1300,0));
+        CHECK(copied.size()==2&&copied[1].find(L'%')==std::wstring::npos);
+        poll(Sample{},1400);
+        CHECK(field.guidingLands()&&field.total()==150&&!field.dataAvailable());
+        auto town = guiding;
+        town.stage = 305;
+        town.expedition = false;
+        town.countersValid = false;
+        poll(town,1500);
+        CHECK(!field.guidingLands()&&!visible.visible()&&field.total()==0&&!canCopyDamage(field,false));
+        guiding.players[0].damage = 0;
+        poll(guiding,1600);
+        CHECK(field.serial()!=visit&&field.total()==0&&visible.visible());
+        auto questInArea = sample;
+        questInArea.questId = 51606;
+        questInArea.stage = GuidingLandsStage;
+        questInArea.expedition = isExpeditionField(questInArea.questId, questInArea.state, questInArea.stage);
+        poll(questInArea,1700);
+        CHECK(archived==1&&!field.expedition()&&field.total()==70000&&field.questId()==51606);
+    }
+    {
         Meter completed;completed.update(sample,100);
         auto end=sample;end.state=3;completed.update(end,1000);completed.update(end,4000);
         CHECK(completed.phase()==Phase::Summary&&canCopyDamage(completed,false));

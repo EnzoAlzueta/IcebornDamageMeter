@@ -130,19 +130,25 @@ bool rebuildPanelCache() {
 #endif
     return true;
 }
-void paint(UINT index) {
+void paint(UINT index,const IcebornPreviewArea* area=nullptr) {
     const auto size=targets[index]->GetSize();if(size.width<100||size.height<100)return;
     screenWidth=size.width;screenHeight=size.height;
     const float width=static_cast<float>(panel.config.width),height=presentation.height;
     const float fit=(std::min)({scale,(size.width-16)/width,(size.height-16)/height});
-    if(legacyPlacement) {
+    if(legacyPlacement && !area) {
         const bool right=corner==1||corner==2,bottom=corner==2||corner==3;
         placement.load((right?size.width-width*fit-12:12)/size.width,(bottom?size.height-height*fit-12:12)/size.height);
         legacyPlacement=false;
     }
     panelRect=placement.bounds(size.width,size.height,width*fit,height*fit);
     const auto badge=placement.bounds(size.width,size.height,36,24);badgeRect={badge.x,badge.y,36,24};
-    pointerInteraction(width*fit,height*fit);
+    if(area) {
+        if(area->x>=0){
+            panelRect.x=std::clamp(size.width*area->x/100.f,0.f,size.width-panelRect.width);
+            panelRect.y=std::clamp(size.height*area->y/100.f,0.f,size.height-panelRect.height);
+        }
+        panelRect.y=area->displayTop(panelRect.x,panelRect.y,panelRect.width,panelRect.height);
+    } else pointerInteraction(width*fit,height*fit);
     const bool contentChanged=sceneDirty||!panelCommands;
     if(visible && contentChanged && !rebuildPanelCache())return;
     static bool previousVisible=false;
@@ -150,7 +156,7 @@ void paint(UINT index) {
     const auto currentRect=visible?panelRect:badgeRect;
     const bool samePlacement=currentRect.x==previousRect.x&&currentRect.y==previousRect.y&&
         currentRect.width==previousRect.width&&currentRect.height==previousRect.height;
-    const bool reusable=gameDevice11&&(!visible||!contentChanged)&&!isEditing()&&previousVisible==visible&&samePlacement;
+    const bool reusable=gameDevice11&&(!visible||!contentChanged)&&(area||!isEditing())&&previousVisible==visible&&samePlacement;
     previousVisible=visible;previousRect=currentRect;
     if(reusable) {
         const auto reused=dx11.reuse();
@@ -166,12 +172,13 @@ void paint(UINT index) {
     auto bounds=visible?D2D1::RectF(panelRect.x-2,panelRect.y-2,panelRect.x+panelRect.width+2,panelRect.y+panelRect.height+2):
         D2D1::RectF(badgeRect.x-2,badgeRect.y-2,badgeRect.x+badgeRect.width+2,badgeRect.y+badgeRect.height+2);
     POINT cursor{};bool down=false;RECT client{};
-    const bool showPointer=getEditPointer(cursor,down)&&GetClientRect(window,&client)&&client.right>0&&client.bottom>0;
+    const bool showPointer=!area&&getEditPointer(cursor,down)&&GetClientRect(window,&client)&&client.right>0&&client.bottom>0;
     const float pointerX=showPointer?cursor.x*size.width/client.right:0,pointerY=showPointer?cursor.y*size.height/client.bottom:0;
     if(showPointer){bounds.left=(std::min)(bounds.left,pointerX-4);bounds.top=(std::min)(bounds.top,pointerY-4);
         bounds.right=(std::max)(bounds.right,pointerX+20);bounds.bottom=(std::max)(bounds.bottom,pointerY+26);}
     if(gameDevice11) {
-        // Clear only the area that will be composited, not a full-screen texture.
+        // Match the DX11 scissor so fractional placements cannot expose stale pixels.
+        bounds={std::floor(bounds.left),std::floor(bounds.top),std::ceil(bounds.right),std::ceil(bounds.bottom)};
         context2d->SetTransform(D2D1::Matrix3x2F::Identity());
         context2d->PushAxisAlignedClip(bounds,D2D1_ANTIALIAS_MODE_ALIASED);
         context2d->Clear(D2D1::ColorF(0,0.0f));context2d->PopAxisAlignedClip();
@@ -184,7 +191,7 @@ void paint(UINT index) {
     } else {
         context2d->SetTransform(D2D1::Matrix3x2F::Scale(fit,fit)*D2D1::Matrix3x2F::Translation(panelRect.x,panelRect.y));
         context2d->DrawImage(panelCommands.Get());
-        if(isEditing()) {
+        if(!area&&isEditing()) {
             brush->SetColor(D2D1::ColorF(0xc4b77a));
             context2d->DrawRectangle(D2D1::RectF(1,1,width-1,height-1),brush.Get(),1.5f);
         }

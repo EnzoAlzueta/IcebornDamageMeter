@@ -4,6 +4,11 @@ Damage is the absolute party counter read from the supported game profile. It
 is sampled at 4 Hz and is never summed repeatedly. Team percentage divides a
 player's counter by the sum of all recorded players, including departed players.
 
+In Guiding Lands, the meter observes the damage numbers emitted for the local
+hunter's hits and samples the running total at the same 4 Hz. The total covers
+the current visit, including multiple monsters. This live session is excluded
+from quest history and personal comparisons.
+
 Observed DPS is `(current damage - first observed damage) / participation time`.
 The time includes downtime while the player is present. It freezes when the
 player leaves or the quest ends; final damage synchronization may arrive later.

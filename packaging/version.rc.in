@@ -13,12 +13,12 @@ BEGIN
   BEGIN
    VALUE "CompanyName", "Enzo and contributors\0"
    VALUE "FileDescription", "Iceborne Damage Meter\0"
-   VALUE "FileVersion", "@PROJECT_VERSION@\0"
+   VALUE "FileVersion", "@PROJECT_VERSION@-suite-dev.4\0"
    VALUE "InternalName", "iceborne_damage_meter\0"
    VALUE "LegalCopyright", "Copyright (c) 2026 Enzo and contributors. MIT License.\0"
    VALUE "OriginalFilename", "iceborne_damage_meter.dll\0"
    VALUE "ProductName", "Iceborne Damage Meter\0"
-   VALUE "ProductVersion", "@PROJECT_VERSION@\0"
+   VALUE "ProductVersion", "@PROJECT_VERSION@-suite-dev.4\0"
   END
  END
  BLOCK "VarFileInfo"

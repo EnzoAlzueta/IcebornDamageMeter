@@ -137,7 +137,8 @@ public:
         }
         return false;
     }
-    PanelView build(const Meter& model,std::uint64_t now,std::uint64_t activeStamp=0) const {
+    PanelView build(const Meter& model,std::uint64_t now,std::uint64_t activeStamp=0,
+                    bool showSettingsShortcut=true) const {
         PanelView view;
         const float width=static_cast<float>(config.width);
         view.compact=page==PanelPage::Current;
@@ -155,8 +156,10 @@ public:
                 L"Ctrl+"+keyName(config.moveKey),keyName(config.showKey),tr(L"Clipboard")};
             const Action actions[]={Action::Details,Action::Last,Action::History,Action::Settings,Action::Move,Action::Close,Action::CopyDamage};
             for(int i=0;i<7;++i) {
+                if(actions[i]==Action::Settings && !showSettingsShortcut) continue;
+                const float y=view.bodyTop+view.rowCount*view.rowHeight;
                 auto& row=view.rows[view.rowCount++];row.name=labels[i];row.value=hints[i];row.colored=false;
-                view.button({10,view.bodyTop+i*view.rowHeight,width-20,view.rowHeight-2},L"",actions[i]);
+                view.button({10,y,width-20,view.rowHeight-2},L"",actions[i]);
             }
             view.footer=L"Ctrl+"+keyName(config.settingsKey)+tr(L" opens/closes this menu");
         } else if(page==PanelPage::Settings) {
@@ -211,14 +214,14 @@ public:
                     const auto append=[&](const std::wstring& part) { if(!row.value.empty())row.value+=L" · ";row.value+=part; };
                     wchar_t text[64]{};
                     if(config.damage)append(std::to_wstring(p.damage));
-                    if(config.share) { swprintf_s(text,L"%.1f%%",record->total()?100.0*p.damage/record->total():0);append(text); }
+                    if(config.share&&!record->guidingLands) { swprintf_s(text,L"%.1f%%",record->total()?100.0*p.damage/record->total():0);append(text); }
                     if(config.dps) { if(p.participationMs>=1000) { swprintf_s(text,L"%.1f/s",p.dps());append(text); } else append(L"—/s"); }
                     if(config.time&&!view.compact)append(clockText(p.participationMs));
                 }
                 const auto label=[&](bool enabled,const wchar_t* text) { if(enabled){if(!view.columns.empty())view.columns+=L" · ";view.columns+=text;} };
-                label(config.damage,tr(L"Damage"));label(config.share,L"%");label(config.dps,L"DPS");label(config.time&&!view.compact,tr(L"Participation"));
+                label(config.damage,tr(L"Damage"));label(config.share&&!record->guidingLands,L"%");label(config.dps,L"DPS");label(config.time&&!view.compact,tr(L"Participation"));
                 view.footer=tr(L"Total: ")+std::to_wstring(record->total())+tr(L" · Time ")+clockText(record->durationMs);
-                if(config.comparison&&!view.compact) {
+                if(config.comparison&&!view.compact&&!record->guidingLands) {
                     const auto previous=history.comparable(*record);const auto local=record->local();
                     if(previous && local && local->participationMs>=1000 && previous->local()->dps()>0) {
                         wchar_t text[128]{};swprintf_s(text,tr(L"Your DPS: %+.1f%% vs last comparable hunt"),100*(local->dps()/previous->local()->dps()-1));view.comparison=text;
@@ -247,7 +250,13 @@ public:
             view.title=model.phase()==Phase::Waiting?tr(L"DAMAGE · WAITING FOR QUEST"):tr(L"DAMAGE · ")+questName(model.questId());
             view.columns.clear();view.footer.clear();view.note.clear();view.comparison.clear();
         }
-        if(model.expedition()&&(page==PanelPage::Current||page==PanelPage::Details)) {
+        if(model.guidingLands()&&(page==PanelPage::Current||page==PanelPage::Details)) {
+            view.title=tr(L"Guiding Lands · Personal damage");
+            if(!model.dataAvailable()) {
+                view.note=tr(L"Expedition damage unavailable");
+                if(view.compact&&model.phase()==Phase::Waiting)view.title=tr(L"EXPEDITION · NO DATA");
+            }
+        } else if(model.expedition()&&(page==PanelPage::Current||page==PanelPage::Details)) {
             view.title=tr(L"EXPEDITION · NO DATA");
             view.note=tr(L"Expedition damage unavailable");
             view.footer.clear();view.comparison.clear();view.columns.clear();

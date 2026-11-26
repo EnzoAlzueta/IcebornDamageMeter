@@ -7,7 +7,8 @@
 | Graphics | DX11 or DX12, automatically selected, 8-bit SDR |
 | Loading | Included bootstrap; Stracker directly; Seamless through XInput chain |
 | Unsupported executable | Damage reading disabled |
-| Expeditions / Guiding Lands | Damage measurement unsupported |
+| Guiding Lands | Personal hit damage during the current visit |
+| Other expeditions | Damage measurement unsupported |
 | HDR / device-loss recovery | Outside current renderer support |
 
 The package manifest records the supported hash. Loading, graphics and memory
@@ -39,7 +40,9 @@ failures. Do not redistribute or restore those versions. See [validation](VALIDA
 
 Damage in normal quests, arena and events follows quest counters. Procedural
 investigation ID 30000 is labeled Investigation and excluded from comparisons.
-Expedition contexts display no data. Unknown/custom quest IDs stay numbered.
+Guiding Lands uses a verified-build hit callback and displays the local hunter's
+damage. If the callback cannot be installed, this area reports damage unavailable.
+Unknown/custom quest IDs stay numbered.
 
 For reports, include mod version, API, loader/version, host/guest, quest type and
 reproduction steps. Inspect the meter log and separate bootstrap log; with

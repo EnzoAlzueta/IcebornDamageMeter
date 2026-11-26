@@ -5,9 +5,26 @@ std::uint64_t utcMilliseconds() {
 }
 std::wstring actionNotice;
 std::uint64_t actionNoticeUntil=0;
-void refreshRows() {
-    presentation=panel.build(model,GetTickCount64(),model.serial()==archivedSerial?activeStamp:0);
-    if(preview && panel.page==PanelPage::Current) {
+bool suitePreviewBuilt=false;
+const Meter& exampleHunt() {
+    static const Meter example=[] {
+        Meter result;
+        Sample s{};s.valid=true;s.countersValid=true;s.questId=502;s.state=2;
+        for(int i=0;i<4;++i)s.players[i]={static_cast<uint64_t>(i+1),L"Cazador "+std::to_wstring(i+1),0,i==0,true,i};
+        result.update(s,1000);
+        for(int i=0;i<4;++i)s.players[i].damage=4000-750*i;
+        result.update(s,31000);
+        return result;
+    }();
+    return example;
+}
+void refreshRows(bool suiteExample=false) {
+    if(suiteExample) {
+        presentation=panel.build(exampleHunt(),31000,0);
+        presentation.title=tr(L"PREVIEW · SAMPLE DATA");
+    } else presentation=panel.build(model,GetTickCount64(),model.serial()==archivedSerial?activeStamp:0,
+                                    suiteOpen.load()!=nullptr);
+    if(!suiteExample && preview && panel.page==PanelPage::Current) {
         presentation.title=tr(L"PREVIEW · SAMPLE DATA");
         presentation.rowCount=0;
         size_t count=4;
@@ -37,10 +54,10 @@ void refreshRows() {
     }
     heading=presentation.title;footer=presentation.footer;note=presentation.note;
     if(GetTickCount64()<actionNoticeUntil&&!presentation.compact)footer=actionNotice;
-    if(GetTickCount64()<actionNoticeUntil&&presentation.compact)heading=actionNotice;
+    if(!suiteExample && GetTickCount64()<actionNoticeUntil&&presentation.compact)heading=actionNotice;
     if(!preview && panel.page==PanelPage::Current) {
         if(!supported.load())note=tr(L"Checking game version or unsupported version");
-        else if(model.phase()==Phase::Live&&!model.dataAvailable())note=tr(L"Team data unavailable · loading or special mode");
+        else if(model.phase()==Phase::Live&&!model.dataAvailable()&&!model.guidingLands())note=tr(L"Team data unavailable · loading or special mode");
     }
     if(presentation.compact){footer.clear();note.clear();}
     rowCount=presentation.rowCount;
@@ -87,7 +104,7 @@ bool pollHunt(std::uint64_t now) {
     if (model.serial() != previousSerial) {
         panel.page = PanelPage::Current;
         preview = false;
-        setEditing(false);
+        if(!suiteEditing.load()) setEditing(false);
         return true;
     }
 
@@ -97,6 +114,14 @@ bool pollHunt(std::uint64_t now) {
         (after == Phase::Live || after == Phase::Settling || before != after || wasExpedition != model.expedition()));
 }
 void processAction(PendingAction command) {
+    if(command.action==Action::Settings) {
+        if(auto open=suiteOpen.load()) {
+            panel.page=PanelPage::Current;
+            setEditing(false);
+            open(window,panel.config.settingsKey);
+        }
+        return;
+    }
     if(command.action==Action::CopyDamage) {
         // Copy the cached totals even if a transitional sample is unavailable.
         if(!canCopyDamage(model,preview)) {
@@ -114,7 +139,7 @@ void processAction(PendingAction command) {
     if(configChanged)saveSettings();
     if(command.action==Action::Current||command.action==Action::Details||command.action==Action::Last||command.action==Action::SelectRecord)preview=false;
     if(command.action==Action::Current||(command.action==Action::Menu&&panel.page==PanelPage::Current))setEditing(false);
-    if(command.action==Action::Move||panel.page==PanelPage::Menu||panel.page==PanelPage::Settings||panel.page==PanelPage::History) {
+    if(command.action==Action::Move||panel.page==PanelPage::Menu||panel.page==PanelPage::History) {
         if(!visibility.visible())visibility.toggle();
         if(installInput(window))setEditing(true);
     }
@@ -127,6 +152,12 @@ void poll() {
         previousLanguageRevision=languageRevision.load();refreshRequested=true;
     }
     bool changed=refreshRequested;refreshRequested=false;
+    static bool settingsConnected=false;
+    const bool connected=suiteOpen.load()!=nullptr;
+    if(settingsConnected!=connected) {
+        settingsConnected=connected;
+        changed=true;
+    }
     if(actionNoticeUntil&&GetTickCount64()>=actionNoticeUntil) {
         actionNotice.clear();actionNoticeUntil=0;changed=true;
     }
@@ -142,9 +173,9 @@ void poll() {
         if(pressed(config.moveKey)&&(GetAsyncKeyState(VK_CONTROL)&0x8000)) {
             if(installInput(window))setEditing(!isEditing());changed=true;
         }
-        if(pressed(config.settingsKey)) {
+        if(!(GetAsyncKeyState(config.settingsKey)&0x8000))waitForSettingsRelease=false;
+        if(pressed(config.settingsKey) && !waitForSettingsRelease.load()) {
             if(GetAsyncKeyState(VK_CONTROL)&0x8000)processAction({Action::Menu,0});
-            else if(panel.page==PanelPage::Settings) {panel.page=PanelPage::Current;setEditing(false);}
             else processAction({Action::Settings,0});changed=true;
         }
         if(pressed(config.historyKey)) {

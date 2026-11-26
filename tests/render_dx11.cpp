@@ -1,5 +1,6 @@
 #include "../src/runtime.hpp"
 #include "../src/language.hpp"
+#include "../dependencies/preview-dev.1/iceborn_preview.hpp"
 #include <d3d11_1.h>
 #include <dxgi1_4.h>
 #include <wrl/client.h>
@@ -10,6 +11,8 @@
 #include <cmath>
 #include "external_overlay.hpp"
 using Microsoft::WRL::ComPtr;
+extern "C" int IcebornDrawMeterPreviewV1(void*,const IcebornPreviewArea*);
+extern "C" int IcebornDrawMeterSettingPreview(void*,const IcebornPreviewArea*,int,int);
 namespace meter {
 void diagnosticPreview(bool,bool);
 bool diagnosticReady();
@@ -50,6 +53,51 @@ static bool renderedPixels(ID3D11Device* device,ID3D11DeviceContext* context,ID3
         fwrite(&f,sizeof(f),1,output);fwrite(&info,sizeof(info),1,output);fwrite(bitmap.data(),1,bitmap.size(),output);fclose(output);
     }
     return changed>300;
+}
+static std::uint32_t pixelAt(ID3D11Device* device, ID3D11DeviceContext* context,
+                             ID3D11Texture2D* back, UINT x, UINT y) {
+    D3D11_TEXTURE2D_DESC d{};
+    back->GetDesc(&d);
+    d.Width=d.Height=1;
+    d.Usage=D3D11_USAGE_STAGING;
+    d.BindFlags=0;
+    d.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
+    ComPtr<ID3D11Texture2D> staging;
+    require(device->CreateTexture2D(&d,nullptr,&staging),"Readback pixel");
+    const D3D11_BOX region{x,y,0,x+1,y+1,1};
+    context->CopySubresourceRegion(staging.Get(),0,0,0,0,back,0,&region);
+    D3D11_MAPPED_SUBRESOURCE map{};
+    require(context->Map(staging.Get(),0,D3D11_MAP_READ,0,&map),"Readback pixel map");
+    const auto pixel=*static_cast<const std::uint32_t*>(map.pData);
+    context->Unmap(staging.Get(),0);
+    return pixel;
+}
+static void checkPreviewEdges(ID3D11Device* device, ID3D11DeviceContext* context, IDXGISwapChain* chain) {
+    meter::diagnosticPanelSize(260,100);
+    ComPtr<ID3D11Texture2D> back;
+    require(chain->GetBuffer(0,IID_PPV_ARGS(&back)),"Preview backbuffer");
+    ComPtr<ID3D11RenderTargetView> output;
+    require(device->CreateRenderTargetView(back.Get(),nullptr,&output),"Preview RTV");
+    const float background[]{0.05f,0.1f,0.15f,1};
+    context->ClearRenderTargetView(output.Get(),background);
+    const auto original=pixelAt(device,context,back.Get(),225,210);
+    const IcebornPreviewArea first{0,0,0,0,25,20};
+    if(!IcebornDrawMeterPreviewV1(chain,&first) || pixelAt(device,context,back.Get(),225,210)==original)
+        throw std::runtime_error("Suite preview did not paint the regression pixel");
+
+    context->ClearRenderTargetView(output.Get(),background);
+    // The menu displaces the preview to a fractional Y. Its bottom is 208.25.
+    const IcebornPreviewArea second{190,214.25f,500,450,25,20};
+    if(!IcebornDrawMeterPreviewV1(chain,&second) || pixelAt(device,context,back.Get(),225,210)!=original)
+        throw std::runtime_error("Suite preview left a stale pixel outside the relocated panel");
+
+    context->ClearRenderTargetView(output.Get(),background);
+    const auto outside=pixelAt(device,context,back.Get(),425,135);
+    if(!IcebornDrawMeterSettingPreview(chain,&first,2,75) ||
+       pixelAt(device,context,back.Get(),425,135)!=outside)
+        throw std::runtime_error("Suite preview did not apply the temporary scale");
+    if(!IcebornDrawMeterPreviewV1(chain,&first) || pixelAt(device,context,back.Get(),425,135)==outside)
+        throw std::runtime_error("Temporary Suite scale changed the configured value");
 }
 int main(int argc,char** argv) {
     const std::string mode=argc>1?argv[1]:"early";
@@ -181,6 +229,7 @@ int main(int argc,char** argv) {
             if (meter::diagnosticTrackedDamage() != 350 || meter::diagnosticDx11Composites() != composites)
                 throw std::runtime_error("Disabled drawing stopped sampling or still composited pixels");
         }
+        if(mode=="early")checkPreviewEdges(device.Get(),context.Get(),chain.Get());
         meter::shutdownOverlay();meter::removeHooks();
         external.restore();
         if((externalBefore||externalAfter)&&!overlay_fixture::calls)throw std::runtime_error("External overlay bypassed");

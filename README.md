@@ -76,9 +76,11 @@ Existing key bindings are preserved.
 Windows 10/11 x64, DirectX 11 or 12, SDR and the supported executable for memory
 profile 421810. Unsupported executable hashes disable damage reading.
 
-**Expedition and Guiding Lands damage are not supported.** Those contexts show
-no data rather than reusing a previous mission. Multi-target quests show mission
-totals, not per-monster attribution. Investigations sharing generic ID 30000 are
+**Guiding Lands displays personal hit damage and observed DPS for the current
+visit.** The total spans multiple monsters and resets after leaving the area.
+Other hunters, environmental damage and status ticks are outside this measurement.
+Other expeditions display no damage data. Multi-target quests show mission
+totals. Investigations sharing generic ID 30000 are
 excluded from personal DPS comparisons. Official game text covers 512 installed
 PC quest IDs; legacy entries without matching game text retain English fallback.
 Unknown custom quests remain numbered. See [text provenance](assets/quest_text/README.md).

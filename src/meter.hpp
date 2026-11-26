@@ -26,9 +26,13 @@ struct Sample {
     int stage = 0;
     std::array<Player, 4> players{};
 };
+inline constexpr int GuidingLandsStage = 109;
 inline bool isExpeditionField(int questId,int state,int stage) {
-    const bool openMap=(stage>=101&&stage<=105)||stage==108||stage==109;
+    const bool openMap=(stage>=101&&stage<=105)||stage==108||stage==GuidingLandsStage;
     return openMap&&(state==0||(state==2&&questId<=0));
+}
+inline bool isGuidingLands(const Sample& sample) {
+    return sample.expedition && sample.stage == GuidingLandsStage;
 }
 enum class Phase { Waiting, Live, Settling, Summary };
 class Meter {
@@ -42,6 +46,17 @@ class Meter {
     int outcome_ = 0;
     bool hasMerge_ = false;
     bool expedition_ = false;
+    bool guidingLands_ = false;
+    void resetActivity(std::uint64_t now) {
+        players_ = {};
+        questId_ = 0;
+        phase_ = Phase::Waiting;
+        peakParty_ = 0;
+        outcome_ = 0;
+        startAt_ = lastMerge_ = now;
+        finishAt_ = 0;
+        hasMerge_ = dataAvailable_ = partial_ = false;
+    }
     void merge(const Sample& sample, std::uint64_t now, bool advanceTime) {
         if (!sample.countersValid) { dataAvailable_ = false; return; }
         dataAvailable_ = true;
@@ -79,23 +94,32 @@ public:
     // Departed players stay in the denominator and the final summary.
     void update(const Sample& sample, std::uint64_t now) {
         if (!sample.valid) { dataAvailable_ = false; return; }
-        if(sample.expedition) {
-            if(!expedition_) {
-                players_={};questId_=0;phase_=Phase::Waiting;
-                peakParty_=0;outcome_=0;startAt_=finishAt_=lastMerge_=0;
-                hasMerge_=false;partial_=false;++serial_;
+        const bool guiding = isGuidingLands(sample);
+        if (sample.expedition) {
+            if (!expedition_ || guiding != guidingLands_) {
+                resetActivity(now);
+                ++serial_;
             }
-            expedition_=true;previousInQuest_=false;dataAvailable_=false;seenValid_=true;
+            expedition_ = true;
+            guidingLands_ = guiding;
+            previousInQuest_ = false;
+            seenValid_ = true;
+            if (guiding) {
+                if (phase_ == Phase::Waiting && sample.countersValid) {
+                    phase_ = Phase::Live;
+                    startAt_ = now;
+                }
+                if (phase_ == Phase::Live) merge(sample, now, true);
+            }
             return;
         }
-        expedition_=false;
+        if (guidingLands_) resetActivity(now);
+        expedition_ = guidingLands_ = false;
         const bool inQuest = sample.state == 2 && sample.questId > 0;
         if (startsNewHunt(sample)) {
-            players_ = {};
+            resetActivity(now);
             questId_ = sample.questId;
-            finishAt_ = 0;
-            startAt_ = now; lastMerge_ = now; hasMerge_ = false;
-            peakParty_ = 0; outcome_ = 0; ++serial_;
+            ++serial_;
             partial_ = !seenValid_;
             phase_ = Phase::Live;
         }
@@ -115,6 +139,7 @@ public:
     }
     Phase phase() const { return phase_; }
     bool expedition() const { return expedition_; }
+    bool guidingLands() const { return guidingLands_; }
     bool partial() const { return partial_; }
     bool dataAvailable() const { return dataAvailable_; }
     int questId() const { return questId_; }

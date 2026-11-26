@@ -1,6 +1,6 @@
 {
   "name": "Iceborne Damage Meter",
-  "version": "@PROJECT_VERSION@",
+  "version": "@PROJECT_VERSION@-suite-dev.4",
   "platform": "windows-x64",
   "graphics": "DirectX 11 or DirectX 12 (automatic), SDR",
   "gameBuild": "@IDM_SUPPORTED_GAME_BUILD@",

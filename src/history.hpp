@@ -8,7 +8,7 @@ struct HuntRecord {
     std::uint64_t timestamp = 0, durationMs = 0;
     int questId = 0, outcome = 0;
     unsigned partySize = 0;
-    bool partial = false;
+    bool partial = false, guidingLands = false;
     std::array<Player, 16> players{};
     std::uint64_t total() const { std::uint64_t n=0; for (const auto& p:players) n+=p.damage; return n; }
     const Player* local() const { for (const auto& p:players) if(p.id && p.local) return &p; return nullptr; }
@@ -18,6 +18,7 @@ inline HuntRecord captureHunt(const Meter& model, std::uint64_t now, std::uint64
     HuntRecord r;
     r.timestamp=timestamp; r.durationMs=model.durationMs(now); r.questId=model.questId();
     r.outcome=model.outcome(); r.partySize=model.peakParty(); r.partial=model.partial(); r.players=model.ranked();
+    r.guidingLands=model.guidingLands();
     if (interrupted) {
         r.partial = true;
         r.outcome = 6;
@@ -28,7 +29,7 @@ template<class Archive>
 void updateHunt(Meter& model, const Sample& sample, std::uint64_t now, Archive archive) {
     const auto before = model.phase();
     const bool enteringExpedition = sample.valid && sample.expedition && !model.expedition();
-    if (enteringExpedition || model.startsNewHunt(sample)) {
+    if (!model.expedition() && (enteringExpedition || model.startsNewHunt(sample))) {
         if (before == Phase::Live || before == Phase::Settling) archive(before == Phase::Live);
     }
     model.update(sample, now);
